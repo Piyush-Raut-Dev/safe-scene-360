@@ -200,128 +200,71 @@ const StackingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticH
 
   // If this scenario is "chemical containers", it should feel like an upper-rack hazard.
   const y = isChemicalContainers ? 3.95 : Math.max(hazard.y ?? 0, 0);
-  const scale = isChemicalContainers ? 1.45 : 1;
+  const scale = isChemicalContainers ? 1.8 : 1.2;
 
   const boxColor = identified ? '#22c55e' : '#92400e';
   const boxColorLight = identified ? '#22c55e' : '#b45309';
   const boxColorDark = identified ? '#22c55e' : '#78350f';
 
+  const handleClick = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    if (!identified) onIdentify(hazard.id);
+  };
+
   return (
     <group ref={groupRef} position={[hazard.x, y, hazard.z]} scale={[scale, scale, scale]}>
+      {/* Large invisible click target for easy selection from any angle */}
+      <Box args={[3, 2.5, 3]} position={[0.3, 0.9, 0.1]} visible={false} onClick={handleClick} />
+
       {/* Pallet base */}
-      <Box args={[1.4, 0.12, 1.4]} position={[0, 0.06, 0]}>
+      <Box args={[1.4, 0.12, 1.4]} position={[0, 0.06, 0]} onClick={handleClick}>
         <meshStandardMaterial color="#854d0e" />
       </Box>
       {[[-0.5, 0, 0.5].map((x, i) => (
-        <Box key={i} args={[0.12, 0.1, 1.4]} position={[x, -0.01, 0]}>
+        <Box key={i} args={[0.12, 0.1, 1.4]} position={[x, -0.01, 0]} onClick={handleClick}>
           <meshStandardMaterial color="#78350f" />
         </Box>
       ))]}
 
       {/* First layer - stable */}
-      <RoundedBox
-        args={[0.6, 0.45, 0.6]}
-        position={[-0.3, 0.35, -0.3]}
-        radius={0.02}
-        onClick={(e) => {
-          e.stopPropagation();
-          if (!identified) onIdentify(hazard.id);
-        }}
-      >
+      <RoundedBox args={[0.6, 0.45, 0.6]} position={[-0.3, 0.35, -0.3]} radius={0.02} onClick={handleClick}>
         <meshStandardMaterial color={boxColorLight} />
       </RoundedBox>
-      <RoundedBox
-        args={[0.55, 0.4, 0.6]}
-        position={[0.3, 0.32, -0.25]}
-        radius={0.02}
-        onClick={(e) => {
-          e.stopPropagation();
-          if (!identified) onIdentify(hazard.id);
-        }}
-      >
+      <RoundedBox args={[0.55, 0.4, 0.6]} position={[0.3, 0.32, -0.25]} radius={0.02} onClick={handleClick}>
         <meshStandardMaterial color={boxColor} />
       </RoundedBox>
-      <RoundedBox
-        args={[0.5, 0.5, 0.55]}
-        position={[0, 0.37, 0.35]}
-        radius={0.02}
-        onClick={(e) => {
-          e.stopPropagation();
-          if (!identified) onIdentify(hazard.id);
-        }}
-      >
+      <RoundedBox args={[0.5, 0.5, 0.55]} position={[0, 0.37, 0.35]} radius={0.02} onClick={handleClick}>
         <meshStandardMaterial color={boxColorDark} />
       </RoundedBox>
 
       {/* Second layer - starting to lean */}
-      <RoundedBox
-        args={[0.55, 0.4, 0.55]}
-        position={[-0.15, 0.8, 0]}
-        rotation={[0.05, 0.1, 0.08]}
-        onClick={(e) => {
-          e.stopPropagation();
-          if (!identified) onIdentify(hazard.id);
-        }}
-      >
+      <RoundedBox args={[0.55, 0.4, 0.55]} position={[-0.15, 0.8, 0]} rotation={[0.05, 0.1, 0.08]} onClick={handleClick}>
         <meshStandardMaterial color={boxColorLight} />
       </RoundedBox>
-      <RoundedBox
-        args={[0.45, 0.35, 0.5]}
-        position={[0.35, 0.75, -0.1]}
-        rotation={[0.03, -0.05, 0.12]}
-        onClick={(e) => {
-          e.stopPropagation();
-          if (!identified) onIdentify(hazard.id);
-        }}
-      >
+      <RoundedBox args={[0.45, 0.35, 0.5]} position={[0.35, 0.75, -0.1]} rotation={[0.03, -0.05, 0.12]} onClick={handleClick}>
         <meshStandardMaterial color={boxColor} />
       </RoundedBox>
 
       {/* Third layer - very unstable */}
-      <RoundedBox
-        args={[0.5, 0.38, 0.5]}
-        position={[0.1, 1.2, 0.05]}
-        rotation={[-0.08, 0.15, -0.18]}
-        onClick={(e) => {
-          e.stopPropagation();
-          if (!identified) onIdentify(hazard.id);
-        }}
-      >
+      <RoundedBox args={[0.5, 0.38, 0.5]} position={[0.1, 1.2, 0.05]} rotation={[-0.08, 0.15, -0.18]} onClick={handleClick}>
         <meshStandardMaterial color={boxColorDark} />
       </RoundedBox>
 
       {/* Top box - about to fall */}
-      <RoundedBox
-        args={[0.4, 0.3, 0.4]}
-        position={[0.2, 1.55, 0.1]}
-        rotation={[0.1, 0.2, -0.25]}
-        onClick={(e) => {
-          e.stopPropagation();
-          if (!identified) onIdentify(hazard.id);
-        }}
-      >
+      <RoundedBox args={[0.4, 0.3, 0.4]} position={[0.2, 1.55, 0.1]} rotation={[0.1, 0.2, -0.25]} onClick={handleClick}>
         <meshStandardMaterial color={boxColorLight} />
       </RoundedBox>
 
       {/* Fallen box on ground */}
-      <RoundedBox
-        args={[0.45, 0.35, 0.45]}
-        position={[1.3, 0.18, 0.4]}
-        rotation={[0.4, 0.6, 1.3]}
-        radius={0.02}
-        onClick={(e) => {
-          e.stopPropagation();
-          if (!identified) onIdentify(hazard.id);
-        }}
-      >
+      <RoundedBox args={[0.45, 0.35, 0.45]} position={[1.3, 0.18, 0.4]} rotation={[0.4, 0.6, 1.3]} radius={0.02} onClick={handleClick}>
         <meshStandardMaterial color={boxColor} />
       </RoundedBox>
 
       {/* Scattered items from fallen box */}
-      <Sphere args={[0.06, 8, 8]} position={[1.6, 0.06, 0.2]}>
+      <Sphere args={[0.06, 8, 8]} position={[1.6, 0.06, 0.2]} onClick={handleClick}>
         <meshStandardMaterial color="#3b82f6" />
       </Sphere>
-      <Box args={[0.08, 0.08, 0.08]} position={[1.4, 0.04, 0.7]} rotation={[0.3, 0.5, 0.2]}>
+      <Box args={[0.08, 0.08, 0.08]} position={[1.4, 0.04, 0.7]} rotation={[0.3, 0.5, 0.2]} onClick={handleClick}>
         <meshStandardMaterial color="#dc2626" />
       </Box>
 
@@ -363,15 +306,25 @@ const BlockedExitHazard = ({ hazard, identified, onIdentify, showHint }: Realist
         <meshStandardMaterial color="#9ca3af" metalness={0.6} />
       </Box>
 
-      {/* EXIT sign with glow */}
-      <Box args={[0.5, 0.15, 0.03]} position={[0, 2.4, 0.1]}>
+      {/* EMERGENCY EXIT text sign above door */}
+      <Box args={[1.0, 0.25, 0.03]} position={[0, 2.85, 0.1]}>
         <meshStandardMaterial color="#dc2626" emissive="#dc2626" emissiveIntensity={0.8} />
       </Box>
-      <pointLight position={[0, 2.4, 0.3]} color="#dc2626" intensity={2} distance={2} />
+      {/* "EMERGENCY EXIT" text simulation */}
+      <Box args={[0.85, 0.12, 0.032]} position={[0, 2.88, 0.12]}>
+        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.6} />
+      </Box>
+      <Box args={[0.7, 0.06, 0.033]} position={[0, 2.8, 0.13]}>
+        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.4} />
+      </Box>
+      <pointLight position={[0, 2.85, 0.3]} color="#dc2626" intensity={3} distance={3} />
 
-      {/* Running man icon */}
-      <Box args={[0.12, 0.12, 0.01]} position={[0, 2.4, 0.12]}>
-        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.5} />
+      {/* Running man icon on door */}
+      <Box args={[0.18, 0.18, 0.01]} position={[0, 2.0, 0.06]}>
+        <meshStandardMaterial color="#22c55e" emissive="#22c55e" emissiveIntensity={0.5} />
+      </Box>
+      <Box args={[0.1, 0.12, 0.011]} position={[0, 2.0, 0.065]}>
+        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.4} />
       </Box>
 
       {/* Blocking equipment - stacked boxes */}
@@ -429,61 +382,89 @@ const BlockedExitHazard = ({ hazard, identified, onIdentify, showHint }: Realist
   );
 };
 
-// Dock edge missing safety signage (more realistic edge marking + fallen sign)
+// Dock edge missing safety signage - proper A-frame warning stand with fallen/missing signage
 const DockEdgeSignageHazard = ({ hazard, identified, onIdentify, showHint }: RealisticHazardProps) => {
   const y = clampFloorY(hazard);
 
+  const handleClick = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    if (!identified) onIdentify(hazard.id);
+  };
+
   return (
-    <group
-      position={[hazard.x, y, hazard.z]}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (!identified) onIdentify(hazard.id);
-      }}
-    >
-      {/* Painted dock-edge warning band (diagonal stripes) */}
-      <group position={[0, 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <mesh>
-          <planeGeometry args={[3.0, 0.32]} />
+    <group position={[hazard.x, y, hazard.z]}>
+      {/* Large invisible click target */}
+      <Box args={[4, 2, 3]} position={[0, 0.8, 0]} visible={false} onClick={handleClick} />
+
+      {/* Painted dock-edge warning band (diagonal yellow/black stripes) */}
+      <group position={[0, 0.003, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh onClick={handleClick}>
+          <planeGeometry args={[4.0, 0.4]} />
           <meshStandardMaterial color={identified ? '#22c55e' : '#fbbf24'} roughness={0.75} />
         </mesh>
-        {Array.from({ length: 10 }).map((_, i) => (
-          <mesh key={i} position={[-1.35 + i * 0.3, 0.001, 0]} rotation={[0, 0, -0.6]}>
-            <planeGeometry args={[0.14, 0.42]} />
-            <meshStandardMaterial color="#111827" roughness={0.9} transparent opacity={identified ? 0.25 : 0.55} />
+        {Array.from({ length: 14 }).map((_, i) => (
+          <mesh key={i} position={[-1.8 + i * 0.28, 0.001, 0]} rotation={[0, 0, -0.6]} onClick={handleClick}>
+            <planeGeometry args={[0.12, 0.5]} />
+            <meshStandardMaterial color="#111827" roughness={0.9} />
           </mesh>
         ))}
       </group>
 
-      {/* Wall-mounted sign bracket (empty) */}
-      <group position={[-0.9, 1.55, -0.35]}>
-        <Box args={[0.55, 0.35, 0.02]}>
-          <meshStandardMaterial color={identified ? '#22c55e' : '#374151'} transparent opacity={0.45} />
+      {/* A-Frame warning stand - knocked over */}
+      <group position={[-0.8, 0, 0.4]} rotation={[0.9, 0.2, 0.3]}>
+        {/* Left leg */}
+        <Box args={[0.04, 0.9, 0.04]} position={[-0.25, 0.45, 0]} onClick={handleClick}>
+          <meshStandardMaterial color="#fbbf24" metalness={0.2} roughness={0.6} />
         </Box>
-        <Cylinder args={[0.015, 0.015, 0.26, 10]} position={[-0.24, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <meshStandardMaterial color="#6b7280" metalness={0.6} roughness={0.35} />
-        </Cylinder>
-        <Cylinder args={[0.015, 0.015, 0.26, 10]} position={[0.24, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <meshStandardMaterial color="#6b7280" metalness={0.6} roughness={0.35} />
-        </Cylinder>
-      </group>
-
-      {/* Fallen warning sign panel near the edge */}
-      <group position={[0.55, 0.02, 0.35]} rotation={[-Math.PI / 2, 0, 0.35]}>
-        <Box args={[0.62, 0.46, 0.03]}>
-          <meshStandardMaterial color={identified ? '#22c55e' : '#fbbf24'} roughness={0.6} />
+        {/* Right leg */}
+        <Box args={[0.04, 0.9, 0.04]} position={[0.25, 0.45, 0]} onClick={handleClick}>
+          <meshStandardMaterial color="#fbbf24" metalness={0.2} roughness={0.6} />
         </Box>
-        {/* black border */}
-        <Box args={[0.54, 0.38, 0.031]} position={[0, 0, 0.01]}>
-          <meshStandardMaterial color="#111827" roughness={0.9} />
+        {/* Top connector */}
+        <Box args={[0.54, 0.04, 0.04]} position={[0, 0.88, 0]} onClick={handleClick}>
+          <meshStandardMaterial color="#fbbf24" />
         </Box>
-        {/* pictogram */}
-        <Box args={[0.2, 0.2, 0.032]} position={[0, 0.02, 0.02]} rotation={[0, 0, Math.PI / 4]}>
+        {/* Sign panel */}
+        <Box args={[0.5, 0.35, 0.02]} position={[0, 0.65, 0.03]} onClick={handleClick}>
           <meshStandardMaterial color={identified ? '#22c55e' : '#fbbf24'} />
         </Box>
+        {/* Warning triangle */}
+        <Box args={[0.2, 0.2, 0.022]} position={[0, 0.68, 0.04]} rotation={[0, 0, Math.PI / 4]} onClick={handleClick}>
+          <meshStandardMaterial color="#111827" />
+        </Box>
+        {/* Exclamation mark */}
+        <Box args={[0.03, 0.1, 0.023]} position={[0, 0.7, 0.045]} onClick={handleClick}>
+          <meshStandardMaterial color="#fbbf24" />
+        </Box>
       </group>
 
-      {showHint && !identified && <pointLight position={[0.2, 0.7, 0.2]} color="#ef4444" intensity={4} distance={5} />}
+      {/* Upright warning cone (partially knocked) */}
+      <group position={[0.6, 0, 0.3]} rotation={[0.15, 0.1, 0.1]}>
+        <Cylinder args={[0.02, 0.18, 0.45, 12]} position={[0, 0.22, 0]} onClick={handleClick}>
+          <meshStandardMaterial color="#f97316" />
+        </Cylinder>
+        <Cylinder args={[0.08, 0.12, 0.06, 12]} position={[0, 0.32, 0]} onClick={handleClick}>
+          <meshStandardMaterial color="#fef3c7" emissive="#fef3c7" emissiveIntensity={0.2} />
+        </Cylinder>
+        <Cylinder args={[0.18, 0.2, 0.025, 12]} position={[0, 0.012, 0]} onClick={handleClick}>
+          <meshStandardMaterial color="#1f2937" />
+        </Cylinder>
+      </group>
+
+      {/* Missing bollard/guard - just the mounting plate visible */}
+      <group position={[1.2, 0, 0.1]}>
+        <Cylinder args={[0.12, 0.12, 0.03, 16]} position={[0, 0.015, 0]} onClick={handleClick}>
+          <meshStandardMaterial color="#4b5563" metalness={0.6} roughness={0.4} />
+        </Cylinder>
+        {/* Bolt holes */}
+        {[0, Math.PI / 2, Math.PI, Math.PI * 1.5].map((angle, i) => (
+          <Cylinder key={i} args={[0.015, 0.015, 0.035, 8]} position={[Math.cos(angle) * 0.08, 0.017, Math.sin(angle) * 0.08]} onClick={handleClick}>
+            <meshStandardMaterial color="#111827" />
+          </Cylinder>
+        ))}
+      </group>
+
+      {showHint && !identified && <pointLight position={[0, 0.8, 0.3]} color="#ef4444" intensity={4} distance={5} />}
     </group>
   );
 };
@@ -634,17 +615,21 @@ const EquipmentHazard = ({ hazard, identified, onIdentify, showHint }: Realistic
   );
 };
 
-// Flickering/broken industrial light (now properly mounted to ceiling)
+// Flickering/broken industrial light - large fixture with high intensity
 const LightingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticHazardProps) => {
   const lightRef = useRef<THREE.PointLight>(null);
-  const bulbRef = useRef<THREE.Mesh>(null);
+  const bulbRef1 = useRef<THREE.Mesh>(null);
+  const bulbRef2 = useRef<THREE.Mesh>(null);
 
   useFrame(() => {
     if (!identified) {
-      const flicker = Math.random() > 0.7 ? 0 : 1 + Math.random() * 0.5;
-      if (lightRef.current) lightRef.current.intensity = flicker;
-      if (bulbRef.current && bulbRef.current.material) {
-        (bulbRef.current.material as THREE.MeshStandardMaterial).emissiveIntensity = flicker * 0.8;
+      const flicker = Math.random() > 0.6 ? 0 : 2 + Math.random() * 1.5;
+      if (lightRef.current) lightRef.current.intensity = flicker * 2;
+      if (bulbRef1.current && bulbRef1.current.material) {
+        (bulbRef1.current.material as THREE.MeshStandardMaterial).emissiveIntensity = flicker * 1.2;
+      }
+      if (bulbRef2.current && bulbRef2.current.material) {
+        (bulbRef2.current.material as THREE.MeshStandardMaterial).emissiveIntensity = flicker * 0.8;
       }
     }
   });
@@ -659,62 +644,89 @@ const LightingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticH
   return (
     <group position={[hazard.x, baseY, hazard.z]}>
       {/* Large invisible click target for easy selection */}
-      <Box args={[1.5, 1.2, 0.8]} position={[0, -0.2, 0]} visible={false} onClick={handleClick} />
+      <Box args={[3.5, 1.8, 1.2]} position={[0, -0.4, 0]} visible={false} onClick={handleClick} />
 
-      {/* Suspension stem to ceiling */}
-      <Cylinder args={[0.03, 0.03, 0.7, 10]} position={[0, 0.35, 0]} onClick={handleClick}>
-        <meshStandardMaterial color="#4b5563" metalness={0.6} roughness={0.35} />
-      </Cylinder>
-      {/* Ceiling junction box */}
-      <Box args={[0.22, 0.08, 0.22]} position={[0, 0.74, 0]} onClick={handleClick}>
-        <meshStandardMaterial color="#374151" metalness={0.6} roughness={0.35} />
+      {/* Main mounting rail */}
+      <Box args={[2.8, 0.08, 0.15]} position={[0, 0.7, 0]} onClick={handleClick}>
+        <meshStandardMaterial color="#374151" metalness={0.6} roughness={0.4} />
       </Box>
 
-      {/* Light fixture housing */}
-      <Box args={[1, 0.12, 0.35]} position={[0, -0.02, 0]} onClick={handleClick}>
-        <meshStandardMaterial color={identified ? '#22c55e' : '#6b7280'} metalness={0.4} />
+      {/* Suspension chains/cables */}
+      {[-1.1, 0, 1.1].map((xOff, i) => (
+        <Cylinder key={i} args={[0.015, 0.015, 0.5, 8]} position={[xOff, 0.45, 0]} onClick={handleClick}>
+          <meshStandardMaterial color="#6b7280" metalness={0.7} />
+        </Cylinder>
+      ))}
+
+      {/* Large fixture housing */}
+      <Box args={[2.6, 0.18, 0.45]} position={[0, 0.12, 0]} onClick={handleClick}>
+        <meshStandardMaterial color={identified ? '#22c55e' : '#4b5563'} metalness={0.4} roughness={0.5} />
       </Box>
 
-      {/* Reflector */}
-      <Box args={[0.9, 0.08, 0.3]} position={[0, -0.1, 0]} onClick={handleClick}>
-        <meshStandardMaterial color="#9ca3af" metalness={0.7} roughness={0.3} />
+      {/* Reflector panel */}
+      <Box args={[2.5, 0.06, 0.4]} position={[0, 0, 0]} onClick={handleClick}>
+        <meshStandardMaterial color="#d1d5db" metalness={0.8} roughness={0.2} />
       </Box>
 
-      {/* Fluorescent tube - bulb */}
+      {/* Fluorescent tube 1 */}
       <Cylinder
-        ref={bulbRef}
-        args={[0.04, 0.04, 0.85, 16]}
+        ref={bulbRef1}
+        args={[0.045, 0.045, 2.2, 16]}
         rotation={[0, 0, Math.PI / 2]}
-        position={[0, -0.18, 0]}
+        position={[0, -0.12, -0.1]}
         onClick={handleClick}
       >
         <meshStandardMaterial
-          color={identified ? '#22c55e' : '#fef3c7'}
-          emissive={identified ? '#22c55e' : '#fef3c7'}
-          emissiveIntensity={0.8}
+          color={identified ? '#22c55e' : '#fef9c3'}
+          emissive={identified ? '#22c55e' : '#fef9c3'}
+          emissiveIntensity={1.5}
           transparent
-          opacity={0.9}
+          opacity={0.95}
+        />
+      </Cylinder>
+
+      {/* Fluorescent tube 2 */}
+      <Cylinder
+        ref={bulbRef2}
+        args={[0.045, 0.045, 2.2, 16]}
+        rotation={[0, 0, Math.PI / 2]}
+        position={[0, -0.12, 0.1]}
+        onClick={handleClick}
+      >
+        <meshStandardMaterial
+          color={identified ? '#22c55e' : '#fef9c3'}
+          emissive={identified ? '#22c55e' : '#fef9c3'}
+          emissiveIntensity={1.5}
+          transparent
+          opacity={0.95}
         />
       </Cylinder>
 
       {/* End caps */}
-      <Cylinder args={[0.05, 0.05, 0.03, 12]} rotation={[0, 0, Math.PI / 2]} position={[-0.44, -0.18, 0]} onClick={handleClick}>
-        <meshStandardMaterial color="#6b7280" />
-      </Cylinder>
-      <Cylinder args={[0.05, 0.05, 0.03, 12]} rotation={[0, 0, Math.PI / 2]} position={[0.44, -0.18, 0]} onClick={handleClick}>
-        <meshStandardMaterial color="#6b7280" />
-      </Cylinder>
+      {[-1.15, 1.15].map((xOff, i) => (
+        <Box key={i} args={[0.08, 0.12, 0.38]} position={[xOff, -0.1, 0]} onClick={handleClick}>
+          <meshStandardMaterial color="#6b7280" metalness={0.5} />
+        </Box>
+      ))}
 
-      {/* Exposed wiring hanging down */}
-      <Cylinder args={[0.01, 0.01, 0.3, 8]} position={[0.3, -0.35, 0.1]} rotation={[0.3, 0, 0.2]} onClick={handleClick}>
+      {/* Exposed wiring/damage */}
+      <Cylinder args={[0.012, 0.012, 0.5, 8]} position={[0.8, -0.4, 0.15]} rotation={[0.4, 0, 0.3]} onClick={handleClick}>
         <meshStandardMaterial color={identified ? '#22c55e' : '#1f2937'} />
       </Cylinder>
+      <Cylinder args={[0.01, 0.01, 0.35, 8]} position={[-0.6, -0.35, -0.1]} rotation={[0.5, 0, -0.2]} onClick={handleClick}>
+        <meshStandardMaterial color={identified ? '#22c55e' : '#dc2626'} />
+      </Cylinder>
+
+      {/* Sparking point */}
+      <Sphere args={[0.06, 8, 8]} position={[0.7, -0.3, 0.12]} onClick={handleClick}>
+        <meshStandardMaterial color="#fbbf24" emissive="#fbbf24" emissiveIntensity={identified ? 0 : 2} transparent opacity={0.9} />
+      </Sphere>
 
       {!identified && (
-        <pointLight ref={lightRef} position={[0, -0.4, 0]} color="#fef3c7" intensity={1} distance={10} />
+        <pointLight ref={lightRef} position={[0, -0.5, 0]} color="#fef3c7" intensity={3} distance={15} />
       )}
 
-      {showHint && !identified && <pointLight position={[0, -0.6, 0]} color="#ef4444" intensity={3} distance={4} />}
+      {showHint && !identified && <pointLight position={[0, -0.7, 0]} color="#ef4444" intensity={4} distance={5} />}
     </group>
   );
 };
@@ -781,69 +793,81 @@ const PPEHazard = ({ hazard, identified, onIdentify, showHint }: RealisticHazard
 const SafetyShowerHazard = ({ hazard, identified, onIdentify, showHint }: RealisticHazardProps) => {
   const y = clampFloorY(hazard);
 
+  const handleClick = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    if (!identified) onIdentify(hazard.id);
+  };
+
   return (
-    <group
-      position={[hazard.x, y, hazard.z]}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (!identified) onIdentify(hazard.id);
-      }}
-    >
+    <group position={[hazard.x, y, hazard.z]}>
+      {/* Large invisible click target for easy selection from any angle */}
+      <Box args={[2.5, 3, 2]} position={[0.1, 1.3, 0]} visible={false} onClick={handleClick} />
+
       {/* Backboard to imply wall mounting */}
-      <Box args={[1.1, 2.4, 0.08]} position={[0, 1.2, -0.35]}>
+      <Box args={[1.1, 2.4, 0.08]} position={[0, 1.2, -0.35]} onClick={handleClick}>
         <meshStandardMaterial color="#374151" roughness={0.8} />
       </Box>
 
+      {/* SAFETY SHOWER sign above station */}
+      <Box args={[0.9, 0.25, 0.02]} position={[0, 2.55, -0.32]} onClick={handleClick}>
+        <meshStandardMaterial color="#22c55e" emissive="#22c55e" emissiveIntensity={0.3} />
+      </Box>
+      {/* Text simulation on sign */}
+      <Box args={[0.75, 0.1, 0.022]} position={[0, 2.58, -0.3]} onClick={handleClick}>
+        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.2} />
+      </Box>
+      {/* Shower icon */}
+      <Box args={[0.12, 0.08, 0.023]} position={[0, 2.48, -0.3]} onClick={handleClick}>
+        <meshStandardMaterial color="#ffffff" />
+      </Box>
+
       {/* Vertical pipe */}
-      <Cylinder args={[0.06, 0.06, 2.4, 16]} position={[-0.3, 1.2, -0.28]}>
+      <Cylinder args={[0.06, 0.06, 2.4, 16]} position={[-0.3, 1.2, -0.28]} onClick={handleClick}>
         <meshStandardMaterial color={identified ? '#22c55e' : '#22c55e'} metalness={0.2} roughness={0.35} />
       </Cylinder>
 
       {/* Shower head */}
-      <Cylinder args={[0.18, 0.18, 0.06, 20]} position={[-0.3, 2.35, -0.28]}>
+      <Cylinder args={[0.18, 0.18, 0.06, 20]} position={[-0.3, 2.35, -0.28]} onClick={handleClick}>
         <meshStandardMaterial color="#9ca3af" metalness={0.8} roughness={0.25} />
       </Cylinder>
-      <Cylinder args={[0.2, 0.06, 0.12, 20]} position={[-0.3, 2.26, -0.28]} rotation={[Math.PI, 0, 0]}>
+      <Cylinder args={[0.2, 0.06, 0.12, 20]} position={[-0.3, 2.26, -0.28]} rotation={[Math.PI, 0, 0]} onClick={handleClick}>
         <meshStandardMaterial color="#9ca3af" metalness={0.8} roughness={0.25} />
       </Cylinder>
 
       {/* Eyewash bowl */}
-      <Cylinder args={[0.28, 0.34, 0.18, 24]} position={[-0.3, 1.05, -0.22]}>
+      <Cylinder args={[0.28, 0.34, 0.18, 24]} position={[-0.3, 1.05, -0.22]} onClick={handleClick}>
         <meshStandardMaterial color="#9ca3af" metalness={0.7} roughness={0.3} />
       </Cylinder>
-      <Box args={[0.55, 0.06, 0.25]} position={[-0.3, 1.18, -0.12]}>
+      <Box args={[0.55, 0.06, 0.25]} position={[-0.3, 1.18, -0.12]} onClick={handleClick}>
         <meshStandardMaterial color="#9ca3af" metalness={0.7} roughness={0.3} />
       </Box>
 
       {/* Pull rod */}
-      <Cylinder args={[0.012, 0.012, 0.75, 10]} position={[-0.3, 1.95, -0.12]}>
+      <Cylinder args={[0.012, 0.012, 0.75, 10]} position={[-0.3, 1.95, -0.12]} onClick={handleClick}>
         <meshStandardMaterial color="#fbbf24" metalness={0.2} roughness={0.55} />
       </Cylinder>
-      <Box args={[0.12, 0.12, 0.12]} position={[-0.3, 1.57, -0.12]}>
+      <Box args={[0.12, 0.12, 0.12]} position={[-0.3, 1.57, -0.12]} onClick={handleClick}>
         <meshStandardMaterial color="#fbbf24" roughness={0.6} />
       </Box>
 
-      {/* Green safety sign */}
-      <Box args={[0.55, 0.35, 0.02]} position={[0.4, 2.1, -0.3]}>
+      {/* Green safety sign with eyewash icon */}
+      <Box args={[0.55, 0.35, 0.02]} position={[0.4, 2.1, -0.3]} onClick={handleClick}>
         <meshStandardMaterial color={identified ? '#22c55e' : '#22c55e'} emissive={identified ? '#22c55e' : '#16a34a'} emissiveIntensity={0.2} />
       </Box>
-      <Box args={[0.18, 0.18, 0.021]} position={[0.4, 2.1, -0.28]} rotation={[0, 0, Math.PI / 4]}>
+      <Box args={[0.18, 0.18, 0.021]} position={[0.4, 2.1, -0.28]} rotation={[0, 0, Math.PI / 4]} onClick={handleClick}>
         <meshStandardMaterial color="#f8fafc" />
       </Box>
 
       {/* Obstruction: pallet + boxes blocking access */}
-      <Box args={[1.1, 0.1, 0.8]} position={[0.2, 0.05, 0.2]}>
+      <Box args={[1.1, 0.1, 0.8]} position={[0.2, 0.05, 0.2]} onClick={handleClick}>
         <meshStandardMaterial color={identified ? '#22c55e' : '#a16207'} roughness={0.9} />
       </Box>
-      <RoundedBox args={[0.55, 0.55, 0.55]} position={[0.2, 0.38, 0.2]} radius={0.03}>
+      <RoundedBox args={[0.55, 0.55, 0.55]} position={[0.2, 0.38, 0.2]} radius={0.03} onClick={handleClick}>
         <meshStandardMaterial color={identified ? '#22c55e' : '#b45309'} roughness={0.85} />
       </RoundedBox>
-      <RoundedBox args={[0.5, 0.4, 0.5]} position={[0.55, 0.75, 0.25]} radius={0.03} rotation={[0.05, 0.2, 0.08]}>
+      <RoundedBox args={[0.5, 0.4, 0.5]} position={[0.55, 0.75, 0.25]} radius={0.03} rotation={[0.05, 0.2, 0.08]} onClick={handleClick}>
         <meshStandardMaterial color={identified ? '#22c55e' : '#92400e'} roughness={0.85} />
       </RoundedBox>
-
-      {/* Larger invisible click target so it is easy to select */}
-      <Box args={[2.2, 2.6, 1.8]} position={[0.1, 1.25, 0]} visible={false} />
 
       {showHint && !identified && <pointLight position={[0, 2.0, 0.2]} color="#ef4444" intensity={4} distance={5} />}
     </group>

@@ -8,13 +8,17 @@ import {
   AlertTriangle, 
   ArrowLeft,
   Play,
-  Info
+  Info,
+  Gamepad2,
+  Clock,
+  Target
 } from 'lucide-react';
 import { mockScenes } from '@/data/mockData';
 import { toast } from 'sonner';
 import { WarehouseScene3D } from '@/components/scene/WarehouseScene3D';
 import { GameHUD } from '@/components/scene/GameHUD';
 import { GameResults } from '@/components/scene/GameResults';
+import { Crosshair } from '@/components/scene/Crosshair';
 
 const SceneViewer = () => {
   const { sceneId } = useParams();
@@ -204,6 +208,9 @@ const SceneViewer = () => {
   // Game screen
   return (
     <div className="fixed inset-0 bg-background">
+      {/* Fixed Crosshair - Always visible during gameplay */}
+      {!showResults && <Crosshair />}
+      
       {/* Back button - outside game area */}
       <div className="absolute top-4 left-4 z-50">
         <Button

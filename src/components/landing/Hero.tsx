@@ -1,93 +1,147 @@
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Eye, ClipboardCheck, ArrowRight } from 'lucide-react';
+import { Shield, ArrowRight, Zap, Target, Award } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export const Hero = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-accent/80" />
+    <section className="relative min-h-screen overflow-hidden flex items-center">
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-accent/20" />
       
-      {/* Pattern overlay */}
+      {/* Grid pattern overlay */}
       <div 
-        className="absolute inset-0 opacity-10"
+        className="absolute inset-0 opacity-[0.03]"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundImage: `
+            linear-gradient(hsl(var(--primary) / 0.5) 1px, transparent 1px),
+            linear-gradient(90deg, hsl(var(--primary) / 0.5) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
         }}
       />
+      
+      {/* Glowing orbs */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[128px] animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/30 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }} />
+      
+      {/* Floating elements */}
+      <motion.div 
+        className="absolute top-20 right-20 w-20 h-20 border border-primary/30 rounded-lg"
+        animate={{ 
+          rotate: [0, 90, 180, 270, 360],
+          y: [0, -20, 0, 20, 0]
+        }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+      />
+      <motion.div 
+        className="absolute bottom-40 left-20 w-12 h-12 bg-accent/20 rounded-full"
+        animate={{ 
+          scale: [1, 1.2, 1],
+          opacity: [0.5, 1, 0.5]
+        }}
+        transition={{ duration: 4, repeat: Infinity }}
+      />
 
-      <div className="container relative mx-auto px-4 py-24 lg:py-32">
-        <div className="mx-auto max-w-4xl text-center">
+      <div className="container relative mx-auto px-4 py-20">
+        <div className="mx-auto max-w-5xl text-center">
           {/* Badge */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-4 py-2 backdrop-blur-sm">
-            <Shield className="h-4 w-4 text-accent" />
-            <span className="text-sm font-medium text-primary-foreground">
-              Next-Gen Safety Training Platform
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-5 py-2.5 backdrop-blur-sm"
+          >
+            <Zap className="h-4 w-4 text-primary" />
+            <span className="text-sm font-medium text-primary">
+              Next-Gen 3D Safety Training Platform
             </span>
-          </div>
+          </motion.div>
 
           {/* Headline */}
-          <h1 className="mb-6 font-display text-4xl font-bold tracking-tight text-primary-foreground md:text-5xl lg:text-6xl">
-            360° Warehouse Safety
-            <span className="block text-accent">Training & Monitoring</span>
-          </h1>
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mb-6 font-display text-5xl font-bold tracking-tight text-foreground md:text-6xl lg:text-7xl"
+          >
+            Immersive{' '}
+            <span className="gradient-text">360° Safety</span>
+            <br />
+            Training for Warehouses
+          </motion.h1>
 
           {/* Description */}
-          <p className="mx-auto mb-10 max-w-2xl text-lg text-primary-foreground/80 md:text-xl">
-            Immersive 360-degree scenes, interactive hazard identification, and comprehensive
-            quizzes to ensure your warehouse team is safety-certified and compliant.
-          </p>
+          <motion.p 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mx-auto mb-12 max-w-2xl text-lg text-muted-foreground md:text-xl"
+          >
+            Experience game-like 3D warehouse environments. Identify hazards, 
+            complete assessments, and ensure your team achieves full safety compliance.
+          </motion.p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-col items-center justify-center gap-4 sm:flex-row"
+          >
             <Button
               size="xl"
               variant="safety"
               onClick={() => navigate('/login')}
-              className="group w-full sm:w-auto"
+              className="group w-full sm:w-auto glow-effect"
             >
               Start Training
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
             <Button
               size="xl"
-              variant="hero-outline"
+              variant="outline"
               onClick={() => navigate('/login')}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto border-primary/50 hover:bg-primary/10 hover:border-primary"
             >
-              Admin Login
+              Admin Dashboard
             </Button>
-          </div>
+          </motion.div>
 
           {/* Stats */}
-          <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3">
-            <div className="rounded-xl border border-primary-foreground/10 bg-primary-foreground/5 p-6 backdrop-blur-sm">
-              <div className="mb-2 font-display text-3xl font-bold text-accent">360°</div>
-              <div className="text-sm text-primary-foreground/70">Immersive Scenes</div>
-            </div>
-            <div className="rounded-xl border border-primary-foreground/10 bg-primary-foreground/5 p-6 backdrop-blur-sm">
-              <div className="mb-2 font-display text-3xl font-bold text-accent">100+</div>
-              <div className="text-sm text-primary-foreground/70">Safety Scenarios</div>
-            </div>
-            <div className="rounded-xl border border-primary-foreground/10 bg-primary-foreground/5 p-6 backdrop-blur-sm">
-              <div className="mb-2 font-display text-3xl font-bold text-accent">98%</div>
-              <div className="text-sm text-primary-foreground/70">Compliance Rate</div>
-            </div>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.5 }}
+            className="mt-20 grid grid-cols-1 gap-6 sm:grid-cols-3"
+          >
+            {[
+              { icon: Target, value: '360°', label: 'Immersive 3D Scenes', color: 'primary' },
+              { icon: Shield, value: '100+', label: 'Safety Scenarios', color: 'accent' },
+              { icon: Award, value: '98%', label: 'Compliance Rate', color: 'success' },
+            ].map((stat, index) => (
+              <motion.div 
+                key={stat.label}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
+                className="group glass-card p-6 hover:border-primary/50 transition-all duration-300"
+              >
+                <div className={`mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-${stat.color}/20 text-${stat.color} group-hover:scale-110 transition-transform`}>
+                  <stat.icon className="h-6 w-6" />
+                </div>
+                <div className="font-display text-4xl font-bold gradient-text mb-1">{stat.value}</div>
+                <div className="text-sm text-muted-foreground">{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </div>
 
-      {/* Bottom wave */}
-      <div className="absolute bottom-0 left-0 right-0">
-        <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
-            className="fill-background"
-          />
-        </svg>
-      </div>
+      {/* Bottom gradient fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
 };

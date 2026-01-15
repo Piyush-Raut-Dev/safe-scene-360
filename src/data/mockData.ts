@@ -53,13 +53,30 @@ export const mockUsers: User[] = [
   },
 ];
 
-export const mockHazards: Hazard[] = [
-  { id: 'h1', x: 25, y: 60, type: 'spill', description: 'Oil spill on floor', severity: 'high' },
-  { id: 'h2', x: 70, y: 40, type: 'stacking', description: 'Unstable pallet stacking', severity: 'critical' },
-  { id: 'h3', x: 15, y: 30, type: 'exit', description: 'Blocked emergency exit', severity: 'critical' },
-  { id: 'h4', x: 85, y: 70, type: 'equipment', description: 'Damaged forklift wheel', severity: 'medium' },
-  { id: 'h5', x: 50, y: 20, type: 'lighting', description: 'Broken overhead light', severity: 'low' },
-  { id: 'h6', x: 40, y: 75, type: 'ppe', description: 'Missing safety signage', severity: 'medium' },
+// Scene 1: Main Storage Area - realistic warehouse hazards
+export const storageHazards: Hazard[] = [
+  { id: 'h1', x: -6, y: 0.02, z: 3, type: 'spill', description: 'Oil spill on floor - slip hazard', severity: 'high', size: 1.5 },
+  { id: 'h2', x: 4, y: 2.5, z: -8, type: 'stacking', description: 'Unstable pallet stacking - falling hazard', severity: 'critical', size: 1 },
+  { id: 'h3', x: -10, y: 1.5, z: 0, type: 'exit', description: 'Blocked emergency exit with boxes', severity: 'critical', size: 1 },
+  { id: 'h4', x: 8, y: 0.3, z: 5, type: 'equipment', description: 'Damaged forklift with flat tire', severity: 'medium', size: 1.2 },
+];
+
+// Scene 2: Loading Dock - shipping area hazards
+export const loadingHazards: Hazard[] = [
+  { id: 'h5', x: -5, y: 0.02, z: 6, type: 'spill', description: 'Water puddle from leaking dock door', severity: 'medium', size: 2 },
+  { id: 'h6', x: 6, y: 0, z: -4, type: 'electrical', description: 'Exposed electrical wiring', severity: 'critical', size: 0.5 },
+  { id: 'h7', x: 0, y: 3, z: 8, type: 'lighting', description: 'Broken overhead light - dim work area', severity: 'low', size: 1 },
+  { id: 'h8', x: -8, y: 1, z: -6, type: 'ppe', description: 'Missing safety signage at dock edge', severity: 'medium', size: 1 },
+];
+
+// Scene 3: Chemical Storage - hazmat hazards
+export const chemicalHazards: Hazard[] = [
+  { id: 'h9', x: -4, y: 0.02, z: -5, type: 'chemical', description: 'Leaking chemical drum - green liquid', severity: 'critical', size: 1.8 },
+  { id: 'h10', x: 5, y: 1.2, z: -3, type: 'fire', description: 'Fire extinguisher blocked by barrels', severity: 'high', size: 1 },
+  { id: 'h11', x: 0, y: 0, z: 4, type: 'ppe', description: 'Safety shower obstructed', severity: 'high', size: 1 },
+  { id: 'h12', x: -7, y: 1.5, z: 2, type: 'stacking', description: 'Improperly stacked chemical containers', severity: 'critical', size: 1 },
+  { id: 'h13', x: 8, y: 0.5, z: 0, type: 'electrical', description: 'Damaged electrical panel cover', severity: 'high', size: 0.8 },
+  { id: 'h14', x: 3, y: 2.8, z: -7, type: 'lighting', description: 'Flickering emergency light', severity: 'medium', size: 0.6 },
 ];
 
 export const mockScenes: Scene[] = [
@@ -68,7 +85,7 @@ export const mockScenes: Scene[] = [
     name: 'Main Storage Area',
     description: 'Identify hazards in the primary warehouse storage zone',
     imageUrl: '/placeholder.svg',
-    hazards: mockHazards.slice(0, 4),
+    hazards: storageHazards,
     duration: 10,
     difficulty: 'beginner',
   },
@@ -77,7 +94,7 @@ export const mockScenes: Scene[] = [
     name: 'Loading Dock',
     description: 'Safety assessment of the shipping and receiving area',
     imageUrl: '/placeholder.svg',
-    hazards: mockHazards.slice(2, 6),
+    hazards: loadingHazards,
     duration: 15,
     difficulty: 'intermediate',
   },
@@ -86,7 +103,7 @@ export const mockScenes: Scene[] = [
     name: 'Chemical Storage',
     description: 'Hazardous materials handling zone inspection',
     imageUrl: '/placeholder.svg',
-    hazards: mockHazards,
+    hazards: chemicalHazards,
     duration: 20,
     difficulty: 'advanced',
   },

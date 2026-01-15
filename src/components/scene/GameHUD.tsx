@@ -207,12 +207,16 @@ export const GameHUD = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card/60 backdrop-blur-md">
+              <span className="text-sm text-white/80 font-mono">WASD</span>
+              <span className="text-sm text-white/60">Move</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card/60 backdrop-blur-md">
               <Eye className="h-4 w-4 text-primary" />
-              <span className="text-sm text-white/80">Drag to look around</span>
+              <span className="text-sm text-white/80">Click to look</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card/60 backdrop-blur-md">
               <Target className="h-4 w-4 text-accent" />
-              <span className="text-sm text-white/80">Click hazards to identify</span>
+              <span className="text-sm text-white/80">Click hazards</span>
             </div>
           </div>
 

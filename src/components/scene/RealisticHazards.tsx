@@ -874,70 +874,155 @@ const SafetyShowerHazard = ({ hazard, identified, onIdentify, showHint }: Realis
   );
 };
 
-// Blocked fire extinguisher
+// Blocked fire extinguisher - realistic wall-mounted design
 const FireHazard = ({ hazard, identified, onIdentify, showHint }: RealisticHazardProps) => {
   const y = clampFloorY(hazard);
+  const snapped = snapToWall(hazard);
+
+  const handleClick = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    if (!identified) onIdentify(hazard.id);
+  };
 
   return (
-    <group
-      position={[hazard.x, y, hazard.z]}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (!identified) onIdentify(hazard.id);
-      }}
-    >
-      {/* Wall mount bracket */}
-      <Box args={[0.35, 0.5, 0.06]} position={[0, 0.6, -0.17]}>
-        <meshStandardMaterial color="#dc2626" />
+    <group position={[snapped.position[0], y, snapped.position[2]]} rotation={[0, snapped.rotationY, 0]}>
+      {/* Large invisible click target */}
+      <Box args={[1.8, 2, 1.5]} position={[0, 0.8, 0.4]} visible={false} onClick={handleClick} />
+
+      {/* Wall backplate */}
+      <Box args={[0.5, 0.8, 0.04]} position={[0, 0.9, -0.02]} onClick={handleClick}>
+        <meshStandardMaterial color="#374151" roughness={0.8} />
       </Box>
 
-      {/* Fire extinguisher body */}
-      <Cylinder args={[0.1, 0.1, 0.55, 20]} position={[0, 0.55, -0.08]}>
-        <meshStandardMaterial color="#dc2626" metalness={0.4} roughness={0.6} />
+      {/* Wall bracket - curved holder */}
+      <group position={[0, 0.55, 0.08]}>
+        {/* Bottom support */}
+        <Box args={[0.25, 0.06, 0.12]} position={[0, 0, 0]} onClick={handleClick}>
+          <meshStandardMaterial color="#dc2626" metalness={0.4} />
+        </Box>
+        {/* Side clips */}
+        <Box args={[0.04, 0.2, 0.08]} position={[-0.12, 0.1, 0]} onClick={handleClick}>
+          <meshStandardMaterial color="#dc2626" metalness={0.4} />
+        </Box>
+        <Box args={[0.04, 0.2, 0.08]} position={[0.12, 0.1, 0]} onClick={handleClick}>
+          <meshStandardMaterial color="#dc2626" metalness={0.4} />
+        </Box>
+      </group>
+
+      {/* Upper strap/hook */}
+      <Cylinder args={[0.02, 0.02, 0.2, 8]} position={[0, 1.1, 0.05]} rotation={[0, 0, Math.PI / 2]} onClick={handleClick}>
+        <meshStandardMaterial color="#dc2626" metalness={0.5} />
       </Cylinder>
 
-      {/* Top valve */}
-      <Cylinder args={[0.04, 0.04, 0.1, 12]} position={[0, 0.87, -0.08]}>
-        <meshStandardMaterial color="#1f2937" metalness={0.6} />
+      {/* Fire extinguisher body - main tank */}
+      <Cylinder args={[0.09, 0.1, 0.48, 24]} position={[0, 0.8, 0.08]} onClick={handleClick}>
+        <meshStandardMaterial color="#dc2626" metalness={0.5} roughness={0.4} />
+      </Cylinder>
+
+      {/* Tank bottom dome */}
+      <Sphere args={[0.1, 16, 16]} position={[0, 0.54, 0.08]} scale={[1, 0.3, 1]} onClick={handleClick}>
+        <meshStandardMaterial color="#dc2626" metalness={0.5} roughness={0.4} />
+      </Sphere>
+
+      {/* Tank top shoulder */}
+      <Cylinder args={[0.1, 0.06, 0.08, 24]} position={[0, 1.08, 0.08]} onClick={handleClick}>
+        <meshStandardMaterial color="#dc2626" metalness={0.5} roughness={0.4} />
+      </Cylinder>
+
+      {/* Valve assembly */}
+      <Cylinder args={[0.04, 0.04, 0.06, 16]} position={[0, 1.15, 0.08]} onClick={handleClick}>
+        <meshStandardMaterial color="#111827" metalness={0.7} roughness={0.3} />
+      </Cylinder>
+
+      {/* Handle/lever */}
+      <Box args={[0.12, 0.02, 0.04]} position={[0, 1.2, 0.08]} onClick={handleClick}>
+        <meshStandardMaterial color="#111827" metalness={0.6} />
+      </Box>
+      <Box args={[0.08, 0.06, 0.02]} position={[0.04, 1.22, 0.08]} onClick={handleClick}>
+        <meshStandardMaterial color="#111827" metalness={0.6} />
+      </Box>
+
+      {/* Pressure gauge */}
+      <Cylinder args={[0.025, 0.025, 0.015, 12]} position={[0, 1.0, 0.19]} rotation={[Math.PI / 2, 0, 0]} onClick={handleClick}>
+        <meshStandardMaterial color="#f1f5f9" />
+      </Cylinder>
+      <Cylinder args={[0.018, 0.018, 0.008, 12]} position={[0, 1.0, 0.195]} rotation={[Math.PI / 2, 0, 0]} onClick={handleClick}>
+        <meshStandardMaterial color="#22c55e" />
       </Cylinder>
 
       {/* Hose */}
-      <Cylinder args={[0.015, 0.015, 0.2, 8]} position={[0.08, 0.8, 0]} rotation={[0.5, 0, 0.5]}>
-        <meshStandardMaterial color="#1f2937" />
+      <Cylinder args={[0.015, 0.015, 0.18, 8]} position={[0.06, 1.05, 0.12]} rotation={[0.6, 0, 0.4]} onClick={handleClick}>
+        <meshStandardMaterial color="#111827" roughness={0.8} />
+      </Cylinder>
+      {/* Hose nozzle */}
+      <Cylinder args={[0.02, 0.012, 0.05, 8]} position={[0.12, 0.92, 0.2]} rotation={[0.8, 0, 0.3]} onClick={handleClick}>
+        <meshStandardMaterial color="#111827" metalness={0.5} />
       </Cylinder>
 
-      {/* Pressure gauge */}
-      <Cylinder args={[0.03, 0.03, 0.015, 12]} position={[0, 0.75, 0.02]} rotation={[Math.PI / 2, 0, 0]}>
-        <meshStandardMaterial color="#fef3c7" />
+      {/* Safety pin ring */}
+      <Cylinder args={[0.015, 0.015, 0.01, 12]} position={[-0.06, 1.2, 0.1]} rotation={[Math.PI / 2, 0, 0]} onClick={handleClick}>
+        <meshStandardMaterial color="#fbbf24" metalness={0.6} />
       </Cylinder>
 
       {/* Label */}
-      <Box args={[0.12, 0.18, 0.005]} position={[0, 0.5, 0.02]}>
+      <Box args={[0.1, 0.14, 0.002]} position={[0, 0.78, 0.185]} onClick={handleClick}>
         <meshStandardMaterial color="#fef3c7" />
       </Box>
+      <Box args={[0.08, 0.04, 0.003]} position={[0, 0.82, 0.186]} onClick={handleClick}>
+        <meshStandardMaterial color="#dc2626" />
+      </Box>
+      <Box args={[0.06, 0.06, 0.003]} position={[0, 0.72, 0.186]} onClick={handleClick}>
+        <meshStandardMaterial color="#111827" />
+      </Box>
 
-      {/* Blocking barrel 1 */}
-      <Cylinder args={[0.32, 0.32, 0.85, 20]} position={[-0.4, 0.42, 0.45]}>
-        <meshStandardMaterial color={identified ? '#22c55e' : '#3b82f6'} metalness={0.3} />
-      </Cylinder>
-      <Cylinder args={[0.28, 0.28, 0.02, 20]} position={[-0.4, 0.85, 0.45]}>
-        <meshStandardMaterial color={identified ? '#22c55e' : '#1e40af'} metalness={0.5} />
-      </Cylinder>
+      {/* FIRE EXTINGUISHER sign above */}
+      <Box args={[0.45, 0.12, 0.02]} position={[0, 1.45, 0]} onClick={handleClick}>
+        <meshStandardMaterial color="#dc2626" emissive="#dc2626" emissiveIntensity={0.2} />
+      </Box>
+      <Box args={[0.4, 0.06, 0.022]} position={[0, 1.45, 0.01]} onClick={handleClick}>
+        <meshStandardMaterial color="#ffffff" />
+      </Box>
 
-      {/* Blocking barrel 2 */}
-      <Cylinder args={[0.32, 0.32, 0.85, 20]} position={[0.4, 0.42, 0.5]}>
-        <meshStandardMaterial color={identified ? '#22c55e' : '#3b82f6'} metalness={0.3} />
-      </Cylinder>
-      <Cylinder args={[0.28, 0.28, 0.02, 20]} position={[0.4, 0.85, 0.5]}>
-        <meshStandardMaterial color={identified ? '#22c55e' : '#1e40af'} metalness={0.5} />
-      </Cylinder>
+      {/* Blocking barrel - pushed against wall in front of extinguisher */}
+      <group position={[0, 0, 0.55]}>
+        <Cylinder args={[0.3, 0.32, 0.82, 24]} position={[0, 0.41, 0]} onClick={handleClick}>
+          <meshStandardMaterial color={identified ? '#22c55e' : '#3b82f6'} metalness={0.35} roughness={0.5} />
+        </Cylinder>
+        {/* Barrel ridges */}
+        <Cylinder args={[0.33, 0.33, 0.04, 24]} position={[0, 0.08, 0]} onClick={handleClick}>
+          <meshStandardMaterial color={identified ? '#22c55e' : '#2563eb'} metalness={0.4} />
+        </Cylinder>
+        <Cylinder args={[0.33, 0.33, 0.04, 24]} position={[0, 0.78, 0]} onClick={handleClick}>
+          <meshStandardMaterial color={identified ? '#22c55e' : '#2563eb'} metalness={0.4} />
+        </Cylinder>
+        {/* Barrel lid */}
+        <Cylinder args={[0.28, 0.28, 0.03, 24]} position={[0, 0.84, 0]} onClick={handleClick}>
+          <meshStandardMaterial color={identified ? '#22c55e' : '#1e40af'} metalness={0.5} />
+        </Cylinder>
+      </group>
 
-      {/* Box on top of barrels */}
-      <RoundedBox args={[0.5, 0.35, 0.4]} position={[0, 1.1, 0.48]} radius={0.02}>
-        <meshStandardMaterial color={identified ? '#22c55e' : '#92400e'} />
+      {/* Second blocking barrel */}
+      <group position={[0.55, 0, 0.4]}>
+        <Cylinder args={[0.3, 0.32, 0.82, 24]} position={[0, 0.41, 0]} onClick={handleClick}>
+          <meshStandardMaterial color={identified ? '#22c55e' : '#3b82f6'} metalness={0.35} roughness={0.5} />
+        </Cylinder>
+        <Cylinder args={[0.33, 0.33, 0.04, 24]} position={[0, 0.08, 0]} onClick={handleClick}>
+          <meshStandardMaterial color={identified ? '#22c55e' : '#2563eb'} metalness={0.4} />
+        </Cylinder>
+        <Cylinder args={[0.33, 0.33, 0.04, 24]} position={[0, 0.78, 0]} onClick={handleClick}>
+          <meshStandardMaterial color={identified ? '#22c55e' : '#2563eb'} metalness={0.4} />
+        </Cylinder>
+        <Cylinder args={[0.28, 0.28, 0.03, 24]} position={[0, 0.84, 0]} onClick={handleClick}>
+          <meshStandardMaterial color={identified ? '#22c55e' : '#1e40af'} metalness={0.5} />
+        </Cylinder>
+      </group>
+
+      {/* Stacked box on top */}
+      <RoundedBox args={[0.45, 0.32, 0.4]} position={[0.25, 1.05, 0.48]} radius={0.02} rotation={[0, 0.15, 0]} onClick={handleClick}>
+        <meshStandardMaterial color={identified ? '#22c55e' : '#92400e'} roughness={0.85} />
       </RoundedBox>
 
-      {showHint && !identified && <pointLight position={[0, 1.2, 0.4]} color="#ef4444" intensity={4} distance={5} />}
+      {showHint && !identified && <pointLight position={[0, 1.0, 0.5]} color="#ef4444" intensity={4} distance={5} />}
     </group>
   );
 };

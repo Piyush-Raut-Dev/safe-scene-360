@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
+import { Environment, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import type { Hazard } from '@/types';
 import { WarehouseEnvironment } from './WarehouseEnvironment';
@@ -18,8 +18,25 @@ interface WarehouseScene3DProps {
 const SceneContent = ({ hazards, identifiedHazards, onIdentifyHazard, showHints, sceneType }: WarehouseScene3DProps) => {
   return (
     <>
-      <ambientLight intensity={0.3} />
-      <hemisphereLight args={['#87ceeb', '#362907', 0.5]} />
+      {/* Industrial lighting setup */}
+      <ambientLight intensity={0.25} />
+      <hemisphereLight args={['#9dd7ff', '#2a1b07', 0.35]} />
+      <directionalLight
+        position={[10, 12, 6]}
+        intensity={1.2}
+        castShadow
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-near={1}
+        shadow-camera-far={40}
+        shadow-camera-left={-18}
+        shadow-camera-right={18}
+        shadow-camera-top={18}
+        shadow-camera-bottom={-18}
+      />
+
+      {/* Adds physically plausible reflections for painted metal + wet spills */}
+      <Environment preset="warehouse" />
+
       <WarehouseEnvironment sceneType={sceneType} />
       {hazards.map((hazard) => (
         <RealisticHazard

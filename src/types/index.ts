@@ -16,9 +16,11 @@ export interface Hazard {
   id: string;
   x: number;
   y: number;
-  type: string;
+  z: number;
+  type: 'spill' | 'stacking' | 'exit' | 'equipment' | 'lighting' | 'ppe' | 'fire' | 'electrical' | 'chemical';
   description: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
+  size?: number;
 }
 
 export interface Scene {

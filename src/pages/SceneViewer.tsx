@@ -96,8 +96,12 @@ const SceneViewer = () => {
       if (scene && newIdentified.length === scene.hazards.length) {
         setIsComplete(true);
         toast.success('🎉 All hazards found!', {
-          description: 'Great job! Click Submit to see your results.',
+          description: 'Great job! Showing your results...',
         });
+        // Auto-show results after a short delay
+        setTimeout(() => {
+          setShowResults(true);
+        }, 1200);
       }
     }
   }, [identifiedHazards, scene, isComplete, showResults]);

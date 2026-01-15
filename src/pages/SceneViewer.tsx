@@ -98,6 +98,10 @@ const SceneViewer = () => {
         toast.success('🎉 All hazards found!', {
           description: 'Great job! Showing your results...',
         });
+        // Exit pointer lock when training completes
+        if (document.pointerLockElement) {
+          document.exitPointerLock();
+        }
         // Auto-show results after a short delay
         setTimeout(() => {
           setShowResults(true);

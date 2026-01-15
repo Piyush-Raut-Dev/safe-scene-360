@@ -306,31 +306,39 @@ const BlockedExitHazard = ({ hazard, identified, onIdentify, showHint }: Realist
   const y = clampFloorY(hazard);
   const snapped = snapToWall(hazard);
 
+  const handleClick = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    if (!identified) onIdentify(hazard.id);
+  };
+
   return (
     <group position={[snapped.position[0], y, snapped.position[2]]} rotation={[0, snapped.rotationY, 0]}>
+      {/* Large invisible click target for easy selection from any angle */}
+      <Box args={[2.5, 4, 2.5]} position={[0, 1.5, 0.3]} visible={false} onClick={handleClick} />
+
       {/* Floor threshold */}
-      <Box args={[1.4, 0.04, 0.45]} position={[0, 0.02, 0.05]}>
+      <Box args={[1.4, 0.04, 0.45]} position={[0, 0.02, 0.05]} onClick={handleClick}>
         <meshStandardMaterial color="#111827" roughness={0.6} />
       </Box>
 
       {/* Door frame */}
-      <Box args={[0.12, 2.6, 0.15]} position={[-0.55, 1.3, 0]}>
+      <Box args={[0.12, 2.6, 0.15]} position={[-0.55, 1.3, 0]} onClick={handleClick}>
         <meshStandardMaterial color="#374151" metalness={0.3} />
       </Box>
-      <Box args={[0.12, 2.6, 0.15]} position={[0.55, 1.3, 0]}>
+      <Box args={[0.12, 2.6, 0.15]} position={[0.55, 1.3, 0]} onClick={handleClick}>
         <meshStandardMaterial color="#374151" metalness={0.3} />
       </Box>
-      <Box args={[1.22, 0.12, 0.15]} position={[0, 2.6, 0]}>
+      <Box args={[1.22, 0.12, 0.15]} position={[0, 2.6, 0]} onClick={handleClick}>
         <meshStandardMaterial color="#374151" metalness={0.3} />
       </Box>
 
       {/* Door */}
-      <Box args={[1, 2.4, 0.08]} position={[0, 1.25, 0]}>
+      <Box args={[1, 2.4, 0.08]} position={[0, 1.25, 0]} onClick={handleClick}>
         <meshStandardMaterial color="#64748b" metalness={0.2} />
       </Box>
 
       {/* Door handle / push bar */}
-      <Box args={[0.7, 0.08, 0.1]} position={[0, 1.1, 0.08]}>
+      <Box args={[0.7, 0.08, 0.1]} position={[0, 1.1, 0.08]} onClick={handleClick}>
         <meshStandardMaterial color="#9ca3af" metalness={0.6} />
       </Box>
 
@@ -726,8 +734,8 @@ const LightingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticH
 
   return (
     <group position={[hazard.x, baseY, hazard.z]}>
-      {/* Large invisible click target for easy selection */}
-      <Box args={[3.5, 1.8, 1.2]} position={[0, -0.4, 0]} visible={false} onClick={handleClick} />
+      {/* Large invisible click target for easy selection from any angle */}
+      <Box args={[4.5, 2.5, 2.5]} position={[0, -0.4, 0]} visible={false} onClick={handleClick} />
 
       {/* Main mounting rail */}
       <Box args={[2.8, 0.08, 0.15]} position={[0, 0.7, 0]} onClick={handleClick}>
@@ -1138,8 +1146,8 @@ const ElectricalHazard = ({ hazard, identified, onIdentify, showHint }: Realisti
       position={[snapped.position[0], y, snapped.position[2]]}
       rotation={[0, snapped.rotationY, 0]}
     >
-      {/* Large invisible click target for easy selection */}
-      <Box args={[1.2, 1.6, 0.6]} position={[0, 0.7, 0.1]} visible={false} onClick={handleClick} />
+      {/* Large invisible click target for easy selection from any angle */}
+      <Box args={[2.5, 2.5, 2]} position={[0, 0.7, 0.3]} visible={false} onClick={handleClick} />
 
       {/* Backplate to visually "stick" to the wall */}
       <Box args={[0.78, 1.0, 0.02]} position={[0, 0.55, -0.11]} onClick={handleClick}>

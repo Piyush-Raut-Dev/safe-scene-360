@@ -403,26 +403,59 @@ export const WarehouseEnvironment = ({ sceneType }: WarehouseEnvironmentProps) =
           <DockDoor position={[0, 0, -15.5]} open />
           <DockDoor position={[-8, 0, -15.5]} />
           <DockDoor position={[8, 0, -15.5]} open />
-          
+
+          {/* Dock edge safety markings (yellow/black band) */}
+          {[-10, 0, 10].map((x) => (
+            <group key={`dock-edge-${x}`} position={[x, 0, -13.6]}>
+              <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.006, 0]}>
+                <planeGeometry args={[6, 0.25]} />
+                <meshStandardMaterial color="#fbbf24" roughness={0.7} />
+              </mesh>
+              <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.007, 0.12]}>
+                <planeGeometry args={[6, 0.12]} />
+                <meshStandardMaterial color="#1f2937" roughness={0.8} />
+              </mesh>
+            </group>
+          ))}
+
+          {/* Guard rail posts along dock edge */}
+          {[-12, -8, -4, 0, 4, 8, 12].map((x) => (
+            <group key={`rail-${x}`} position={[x, 0, -12.8]}>
+              <Cylinder args={[0.06, 0.06, 1.1, 12]} position={[0, 0.55, 0]}>
+                <meshStandardMaterial color="#f97316" metalness={0.2} roughness={0.6} />
+              </Cylinder>
+              <Cylinder args={[0.08, 0.08, 0.06, 12]} position={[0, 0.03, 0]}>
+                <meshStandardMaterial color="#111827" roughness={0.7} />
+              </Cylinder>
+            </group>
+          ))}
+          <Box args={[28, 0.08, 0.08]} position={[0, 1.05, -12.8]}>
+            <meshStandardMaterial color="#f97316" metalness={0.2} roughness={0.6} />
+          </Box>
+
           {/* Staging area pallets */}
           <Pallet position={[-3, 0, -10]} hasWrap />
           <Pallet position={[0, 0, -10]} hasWrap />
           <Pallet position={[3, 0, -10]} />
           <Pallet position={[-5, 0, -7]} />
           <Pallet position={[6, 0, -7]} hasWrap />
-          
+
           {/* Inbound staging */}
           <Pallet position={[-10, 0, 5]} />
           <Pallet position={[-8, 0, 5]} hasWrap />
           <Pallet position={[8, 0, 6]} />
-          
+
           {/* Forklifts */}
           <Forklift position={[-4, 0, 2]} rotation={Math.PI / 2} />
           <Forklift position={[6, 0, 3]} rotation={-Math.PI / 4} />
-          
-          {/* Some shelving */}
+
+          {/* More shelving to make the bay feel real */}
           <ShelvingUnit position={[-13, 0, 10]} />
           <ShelvingUnit position={[13, 0, 10]} rotation={Math.PI} />
+          <ShelvingUnit position={[-13, 0, 4]} />
+          <ShelvingUnit position={[13, 0, 4]} rotation={Math.PI} />
+          <ShelvingUnit position={[-13, 0, -2]} />
+          <ShelvingUnit position={[13, 0, -2]} rotation={Math.PI} />
         </>
       )}
       

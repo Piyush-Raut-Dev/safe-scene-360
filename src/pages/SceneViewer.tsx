@@ -1,38 +1,121 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { 
   AlertTriangle, 
-  CheckCircle2, 
-  Eye,
-  RotateCcw,
   ArrowLeft,
+  Play,
   Info
 } from 'lucide-react';
 import { mockScenes } from '@/data/mockData';
-import { Hazard } from '@/types';
 import { toast } from 'sonner';
+import { WarehouseScene3D } from '@/components/scene/WarehouseScene3D';
+import { GameHUD } from '@/components/scene/GameHUD';
+import { GameResults } from '@/components/scene/GameResults';
 
 const SceneViewer = () => {
   const { sceneId } = useParams();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [identifiedHazards, setIdentifiedHazards] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [showHints, setShowHints] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [score, setScore] = useState(0);
 
   const scene = mockScenes.find(s => s.id === sceneId);
+  const totalTime = scene ? scene.duration * 60 : 600;
 
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
     }
   }, [isAuthenticated, navigate]);
+
+  // Timer countdown
+  useEffect(() => {
+    if (!gameStarted || showResults || timeRemaining <= 0) return;
+    
+    const timer = setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setShowResults(true);
+          toast.error("Time's up!", {
+            description: 'Review your results and try again to improve.',
+          });
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [gameStarted, showResults, timeRemaining]);
+
+  const handleStartGame = () => {
+    setGameStarted(true);
+    setTimeRemaining(totalTime);
+    setIdentifiedHazards([]);
+    setScore(0);
+    setShowResults(false);
+    setIsComplete(false);
+  };
+
+  const handleHazardClick = useCallback((hazardId: string) => {
+    if (isComplete || showResults) return;
+
+    if (!identifiedHazards.includes(hazardId)) {
+      const hazard = scene?.hazards.find(h => h.id === hazardId);
+      const newIdentified = [...identifiedHazards, hazardId];
+      setIdentifiedHazards(newIdentified);
+      
+      // Score based on severity
+      const severityPoints: Record<string, number> = {
+        critical: 100,
+        high: 75,
+        medium: 50,
+        low: 25
+      };
+      const points = severityPoints[hazard?.severity || 'low'] || 25;
+      setScore(prev => prev + points);
+
+      toast.success(`+${points} Points!`, {
+        description: `${hazard?.description || 'Hazard'} identified.`,
+      });
+
+      if (scene && newIdentified.length === scene.hazards.length) {
+        setIsComplete(true);
+        toast.success('🎉 All hazards found!', {
+          description: 'Great job! Click Submit to see your results.',
+        });
+      }
+    }
+  }, [identifiedHazards, scene, isComplete, showResults]);
+
+  const handleSubmit = () => {
+    setShowResults(true);
+  };
+
+  const handleReset = () => {
+    handleStartGame();
+  };
+
+  const handleContinue = () => {
+    navigate('/training');
+  };
+
+  const getSceneType = (): 'storage' | 'loading' | 'chemical' => {
+    if (!sceneId) return 'storage';
+    if (sceneId.includes('2')) return 'loading';
+    if (sceneId.includes('3')) return 'chemical';
+    return 'storage';
+  };
 
   if (!scene) {
     return (
@@ -56,247 +139,125 @@ const SceneViewer = () => {
     );
   }
 
-  const handleHazardClick = (hazardId: string) => {
-    if (isComplete) return;
-
-    if (!identifiedHazards.includes(hazardId)) {
-      const newIdentified = [...identifiedHazards, hazardId];
-      setIdentifiedHazards(newIdentified);
-      toast.success('Hazard identified!', {
-        description: 'Great work spotting that safety issue.',
-      });
-
-      if (newIdentified.length === scene.hazards.length) {
-        setIsComplete(true);
-        toast.success('All hazards found!', {
-          description: 'You\'ve identified all safety hazards in this scene.',
-        });
-      }
-    }
-  };
-
-  const handleSubmit = () => {
-    setShowResults(true);
-  };
-
-  const handleReset = () => {
-    setIdentifiedHazards([]);
-    setShowResults(false);
-    setIsComplete(false);
-  };
-
-  const accuracy = Math.round((identifiedHazards.length / scene.hazards.length) * 100);
-
-  const getSeverityColor = (severity: Hazard['severity']) => {
-    switch (severity) {
-      case 'critical':
-        return 'bg-destructive';
-      case 'high':
-        return 'bg-accent';
-      case 'medium':
-        return 'bg-warning';
-      case 'low':
-        return 'bg-success';
-      default:
-        return 'bg-muted';
-    }
-  };
-
-  return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/training')}
-              className="mb-2"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Training
-            </Button>
-            <h1 className="font-display text-2xl font-bold text-foreground">
-              {scene.name}
-            </h1>
-            <p className="text-muted-foreground">{scene.description}</p>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">Progress</p>
-              <p className="font-display text-xl font-bold">
-                {identifiedHazards.length} / {scene.hazards.length}
-              </p>
-            </div>
-            <div className="h-16 w-16">
-              <svg className="h-16 w-16 -rotate-90 transform">
-                <circle
-                  cx="32"
-                  cy="32"
-                  r="28"
-                  stroke="currentColor"
-                  strokeWidth="6"
-                  fill="transparent"
-                  className="text-muted"
-                />
-                <circle
-                  cx="32"
-                  cy="32"
-                  r="28"
-                  stroke="currentColor"
-                  strokeWidth="6"
-                  fill="transparent"
-                  strokeDasharray={`${2 * Math.PI * 28}`}
-                  strokeDashoffset={`${2 * Math.PI * 28 * (1 - accuracy / 100)}`}
-                  className="text-accent transition-all duration-500"
-                />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid gap-6 lg:grid-cols-4">
-          {/* Scene Viewer */}
-          <div className="lg:col-span-3">
-            <Card className="overflow-hidden">
-              <div className="relative aspect-video bg-gradient-to-br from-slate-800 to-slate-900">
-                {/* Simulated 360 scene - in production, this would use a 360 viewer library */}
-                <div 
-                  className="absolute inset-0 opacity-30"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.2'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                  }}
-                />
-
-                {/* Warehouse illustration overlay */}
-                <div className="absolute inset-0 flex items-end justify-center p-8">
-                  <div className="flex w-full max-w-4xl items-end justify-between gap-4">
-                    {/* Shelving units */}
-                    <div className="h-32 w-24 rounded bg-slate-600/50" />
-                    <div className="h-40 w-24 rounded bg-slate-600/50" />
-                    <div className="h-36 w-24 rounded bg-slate-600/50" />
-                    <div className="h-44 w-24 rounded bg-slate-600/50" />
-                    <div className="h-32 w-24 rounded bg-slate-600/50" />
-                  </div>
-                </div>
-
-                {/* Hazard hotspots */}
-                {scene.hazards.map((hazard) => (
-                  <button
-                    key={hazard.id}
-                    onClick={() => handleHazardClick(hazard.id)}
-                    className={`scene-hotspot ${identifiedHazards.includes(hazard.id) ? 'identified' : ''}`}
-                    style={{
-                      left: `${hazard.x}%`,
-                      top: `${hazard.y}%`,
-                      transform: 'translate(-50%, -50%)',
-                    }}
-                    title={identifiedHazards.includes(hazard.id) ? hazard.description : 'Click to identify'}
-                  >
-                    {identifiedHazards.includes(hazard.id) ? (
-                      <CheckCircle2 className="h-5 w-5 text-success-foreground" />
-                    ) : (
-                      <AlertTriangle className="h-5 w-5 text-accent-foreground" />
-                    )}
-                  </button>
-                ))}
-
-                {/* 360 indicator */}
-                <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-full bg-card/80 px-3 py-1.5 backdrop-blur-sm">
-                  <Eye className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">360° View</span>
-                </div>
-
-                {/* Instructions */}
-                <div className="absolute right-4 top-4 flex items-center gap-2 rounded-lg bg-card/90 px-3 py-2 backdrop-blur-sm">
-                  <Info className="h-4 w-4 text-primary" />
-                  <span className="text-sm">Click on hazards to identify them</span>
+  // Pre-game screen
+  if (!gameStarted) {
+    return (
+      <MainLayout>
+        <div className="container mx-auto flex min-h-[70vh] items-center justify-center px-4">
+          <Card className="w-full max-w-2xl overflow-hidden">
+            <div className="relative h-48 bg-gradient-to-br from-primary to-accent">
+              <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRoLTJ2LTRoMnY0em0wLThoLTJ2LTRoMnY0em0wLThoLTJWNmgydjEyem0tOCAyMmgtMnYtNGgydjR6bTAtOGgtMnYtNGgydjR6bTAtOGgtMnYtNGgydjR6bTAtOGgtMlY2aDJ2MTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center text-white">
+                  <h1 className="font-display text-3xl font-bold mb-2">{scene.name}</h1>
+                  <p className="opacity-80">{scene.description}</p>
                 </div>
               </div>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-4">
-            {/* Hazard List */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg font-display">
-                  <AlertTriangle className="h-5 w-5 text-accent" />
-                  Hazards Found
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {scene.hazards.map((hazard) => {
-                  const isFound = identifiedHazards.includes(hazard.id);
-                  return (
-                    <div
-                      key={hazard.id}
-                      className={`flex items-center gap-3 rounded-lg p-2 transition-colors ${
-                        isFound ? 'bg-success/10' : 'bg-muted/50'
-                      }`}
-                    >
-                      {isFound ? (
-                        <CheckCircle2 className="h-4 w-4 text-success" />
-                      ) : (
-                        <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30" />
-                      )}
-                      <div className="flex-1">
-                        {isFound ? (
-                          <p className="text-sm font-medium">{hazard.description}</p>
-                        ) : (
-                          <p className="text-sm text-muted-foreground">Hidden hazard</p>
-                        )}
-                      </div>
-                      {isFound && (
-                        <Badge className={getSeverityColor(hazard.severity)} variant="secondary">
-                          {hazard.severity}
-                        </Badge>
-                      )}
-                    </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-
-            {/* Actions */}
-            <div className="flex flex-col gap-2">
-              {!showResults ? (
-                <Button
-                  variant="accent"
-                  className="w-full"
-                  onClick={handleSubmit}
-                  disabled={identifiedHazards.length === 0}
-                >
-                  Submit Assessment
-                </Button>
-              ) : (
-                <Card className="bg-success/10 border-success/20">
-                  <CardContent className="py-4 text-center">
-                    <p className="text-sm text-muted-foreground">Your Accuracy</p>
-                    <p className="font-display text-3xl font-bold text-success">{accuracy}%</p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {identifiedHazards.length} of {scene.hazards.length} hazards
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={handleReset}
-              >
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Reset Scene
-              </Button>
             </div>
-          </div>
+            <CardContent className="p-8">
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="text-center p-4 rounded-lg bg-muted/50">
+                  <p className="text-2xl font-bold text-primary">{scene.hazards.length}</p>
+                  <p className="text-sm text-muted-foreground">Hazards to Find</p>
+                </div>
+                <div className="text-center p-4 rounded-lg bg-muted/50">
+                  <p className="text-2xl font-bold text-accent">{scene.duration} min</p>
+                  <p className="text-sm text-muted-foreground">Time Limit</p>
+                </div>
+                <div className="text-center p-4 rounded-lg bg-muted/50">
+                  <p className="text-2xl font-bold capitalize text-success">{scene.difficulty}</p>
+                  <p className="text-sm text-muted-foreground">Difficulty</p>
+                </div>
+              </div>
+
+              <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-8">
+                <div className="flex items-start gap-3">
+                  <Info className="h-5 w-5 text-primary mt-0.5" />
+                  <div>
+                    <p className="font-medium text-sm">How to Play</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Explore the 360° warehouse environment by clicking and dragging. 
+                      Identify safety hazards by clicking on glowing markers. 
+                      Find all hazards before time runs out to achieve the highest score!
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <Button variant="outline" className="flex-1" onClick={() => navigate('/training')}>
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back
+                </Button>
+                <Button variant="accent" className="flex-1" size="lg" onClick={handleStartGame}>
+                  <Play className="mr-2 h-5 w-5" />
+                  Start Training
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
+      </MainLayout>
+    );
+  }
+
+  // Game screen
+  return (
+    <div className="fixed inset-0 bg-background">
+      {/* Back button - outside game area */}
+      <div className="absolute top-4 left-4 z-50">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate('/training')}
+          className="bg-card/60 backdrop-blur-md hover:bg-card/80"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Exit
+        </Button>
       </div>
-    </MainLayout>
+
+      {/* 3D Scene */}
+      <div className="absolute inset-0">
+        <WarehouseScene3D
+          hazards={scene.hazards}
+          identifiedHazards={identifiedHazards}
+          onIdentifyHazard={handleHazardClick}
+          showHints={showHints}
+          sceneType={getSceneType()}
+        />
+      </div>
+
+      {/* Game HUD overlay */}
+      {!showResults && (
+        <GameHUD
+          sceneName={scene.name}
+          hazards={scene.hazards}
+          identifiedHazards={identifiedHazards}
+          timeRemaining={timeRemaining}
+          totalTime={totalTime}
+          showHints={showHints}
+          onToggleHints={() => setShowHints(!showHints)}
+          onReset={handleReset}
+          onSubmit={handleSubmit}
+          isComplete={isComplete}
+          score={score}
+        />
+      )}
+
+      {/* Results overlay */}
+      {showResults && (
+        <GameResults
+          hazards={scene.hazards}
+          identifiedHazards={identifiedHazards}
+          timeRemaining={timeRemaining}
+          totalTime={totalTime}
+          score={score}
+          onReset={handleReset}
+          onContinue={handleContinue}
+        />
+      )}
+    </div>
   );
 };
 

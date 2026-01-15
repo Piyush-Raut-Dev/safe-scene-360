@@ -651,30 +651,32 @@ const LightingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticH
 
   const baseY = CEILING_Y;
 
+  const handleClick = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    if (!identified) onIdentify(hazard.id);
+  };
+
   return (
-    <group
-      position={[hazard.x, baseY, hazard.z]}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (!identified) onIdentify(hazard.id);
-      }}
-    >
+    <group position={[hazard.x, baseY, hazard.z]}>
+      {/* Large invisible click target for easy selection */}
+      <Box args={[1.5, 1.2, 0.8]} position={[0, -0.2, 0]} visible={false} onClick={handleClick} />
+
       {/* Suspension stem to ceiling */}
-      <Cylinder args={[0.03, 0.03, 0.7, 10]} position={[0, 0.35, 0]}>
+      <Cylinder args={[0.03, 0.03, 0.7, 10]} position={[0, 0.35, 0]} onClick={handleClick}>
         <meshStandardMaterial color="#4b5563" metalness={0.6} roughness={0.35} />
       </Cylinder>
       {/* Ceiling junction box */}
-      <Box args={[0.22, 0.08, 0.22]} position={[0, 0.74, 0]}>
+      <Box args={[0.22, 0.08, 0.22]} position={[0, 0.74, 0]} onClick={handleClick}>
         <meshStandardMaterial color="#374151" metalness={0.6} roughness={0.35} />
       </Box>
 
       {/* Light fixture housing */}
-      <Box args={[1, 0.12, 0.35]} position={[0, -0.02, 0]}>
+      <Box args={[1, 0.12, 0.35]} position={[0, -0.02, 0]} onClick={handleClick}>
         <meshStandardMaterial color={identified ? '#22c55e' : '#6b7280'} metalness={0.4} />
       </Box>
 
       {/* Reflector */}
-      <Box args={[0.9, 0.08, 0.3]} position={[0, -0.1, 0]}>
+      <Box args={[0.9, 0.08, 0.3]} position={[0, -0.1, 0]} onClick={handleClick}>
         <meshStandardMaterial color="#9ca3af" metalness={0.7} roughness={0.3} />
       </Box>
 
@@ -684,6 +686,7 @@ const LightingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticH
         args={[0.04, 0.04, 0.85, 16]}
         rotation={[0, 0, Math.PI / 2]}
         position={[0, -0.18, 0]}
+        onClick={handleClick}
       >
         <meshStandardMaterial
           color={identified ? '#22c55e' : '#fef3c7'}
@@ -695,15 +698,15 @@ const LightingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticH
       </Cylinder>
 
       {/* End caps */}
-      <Cylinder args={[0.05, 0.05, 0.03, 12]} rotation={[0, 0, Math.PI / 2]} position={[-0.44, -0.18, 0]}>
+      <Cylinder args={[0.05, 0.05, 0.03, 12]} rotation={[0, 0, Math.PI / 2]} position={[-0.44, -0.18, 0]} onClick={handleClick}>
         <meshStandardMaterial color="#6b7280" />
       </Cylinder>
-      <Cylinder args={[0.05, 0.05, 0.03, 12]} rotation={[0, 0, Math.PI / 2]} position={[0.44, -0.18, 0]}>
+      <Cylinder args={[0.05, 0.05, 0.03, 12]} rotation={[0, 0, Math.PI / 2]} position={[0.44, -0.18, 0]} onClick={handleClick}>
         <meshStandardMaterial color="#6b7280" />
       </Cylinder>
 
       {/* Exposed wiring hanging down */}
-      <Cylinder args={[0.01, 0.01, 0.3, 8]} position={[0.3, -0.35, 0.1]} rotation={[0.3, 0, 0.2]}>
+      <Cylinder args={[0.01, 0.01, 0.3, 8]} position={[0.3, -0.35, 0.1]} rotation={[0.3, 0, 0.2]} onClick={handleClick}>
         <meshStandardMaterial color={identified ? '#22c55e' : '#1f2937'} />
       </Cylinder>
 
@@ -933,21 +936,25 @@ const ElectricalHazard = ({ hazard, identified, onIdentify, showHint }: Realisti
   const y = clampFloorY(hazard);
   const snapped = snapToWall(hazard);
 
+  const handleClick = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    if (!identified) onIdentify(hazard.id);
+  };
+
   return (
     <group
       position={[snapped.position[0], y, snapped.position[2]]}
       rotation={[0, snapped.rotationY, 0]}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (!identified) onIdentify(hazard.id);
-      }}
     >
+      {/* Large invisible click target for easy selection */}
+      <Box args={[1.2, 1.6, 0.6]} position={[0, 0.7, 0.1]} visible={false} onClick={handleClick} />
+
       {/* Backplate to visually "stick" to the wall */}
-      <Box args={[0.78, 1.0, 0.02]} position={[0, 0.55, -0.11]}>
+      <Box args={[0.78, 1.0, 0.02]} position={[0, 0.55, -0.11]} onClick={handleClick}>
         <meshStandardMaterial color="#111827" roughness={0.8} />
       </Box>
       {/* Electrical panel box */}
-      <RoundedBox args={[0.7, 0.9, 0.2]} position={[0, 0.5, 0]} radius={0.02}>
+      <RoundedBox args={[0.7, 0.9, 0.2]} position={[0, 0.5, 0]} radius={0.02} onClick={handleClick}>
         <meshStandardMaterial color="#374151" metalness={0.4} roughness={0.6} />
       </RoundedBox>
 
@@ -957,35 +964,36 @@ const ElectricalHazard = ({ hazard, identified, onIdentify, showHint }: Realisti
         position={[-0.35, 0.5, 0.15]}
         rotation={[0, -0.8, 0]}
         radius={0.02}
+        onClick={handleClick}
       >
         <meshStandardMaterial color="#4b5563" metalness={0.5} />
       </RoundedBox>
 
       {/* Door handle */}
-      <Box args={[0.03, 0.1, 0.03]} position={[-0.6, 0.5, 0.25]}>
+      <Box args={[0.03, 0.1, 0.03]} position={[-0.6, 0.5, 0.25]} onClick={handleClick}>
         <meshStandardMaterial color="#6b7280" metalness={0.7} />
       </Box>
 
       {/* Interior - circuit breakers */}
       {[0.2, 0.35, 0.5, 0.65, 0.8].map((y2, i) => (
-        <Box key={i} args={[0.5, 0.08, 0.02]} position={[0, y2, 0.06]}>
+        <Box key={i} args={[0.5, 0.08, 0.02]} position={[0, y2, 0.06]} onClick={handleClick}>
           <meshStandardMaterial color="#1f2937" />
         </Box>
       ))}
 
       {/* Exposed wires - DANGER */}
-      <Cylinder args={[0.02, 0.02, 0.45, 8]} position={[0.15, 0.25, 0.15]} rotation={[0.6, 0, 0.4]}>
+      <Cylinder args={[0.02, 0.02, 0.45, 8]} position={[0.15, 0.25, 0.15]} rotation={[0.6, 0, 0.4]} onClick={handleClick}>
         <meshStandardMaterial color={identified ? '#22c55e' : '#f97316'} />
       </Cylinder>
-      <Cylinder args={[0.02, 0.02, 0.4, 8]} position={[-0.1, 0.2, 0.18]} rotation={[0.4, 0, -0.5]}>
+      <Cylinder args={[0.02, 0.02, 0.4, 8]} position={[-0.1, 0.2, 0.18]} rotation={[0.4, 0, -0.5]} onClick={handleClick}>
         <meshStandardMaterial color={identified ? '#22c55e' : '#3b82f6'} />
       </Cylinder>
-      <Cylinder args={[0.02, 0.02, 0.35, 8]} position={[0.05, 0.15, 0.12]} rotation={[0.8, 0, 0.1]}>
+      <Cylinder args={[0.02, 0.02, 0.35, 8]} position={[0.05, 0.15, 0.12]} rotation={[0.8, 0, 0.1]} onClick={handleClick}>
         <meshStandardMaterial color={identified ? '#22c55e' : '#22c55e'} />
       </Cylinder>
 
       {/* Spark point */}
-      <Sphere ref={sparkMeshRef} args={[0.05, 8, 8]} position={[0.1, 0.15, 0.25]}>
+      <Sphere ref={sparkMeshRef} args={[0.05, 8, 8]} position={[0.1, 0.15, 0.25]} onClick={handleClick}>
         <meshStandardMaterial
           color="#60a5fa"
           emissive="#60a5fa"
@@ -996,15 +1004,15 @@ const ElectricalHazard = ({ hazard, identified, onIdentify, showHint }: Realisti
       </Sphere>
 
       {/* Warning label */}
-      <Box args={[0.25, 0.25, 0.005]} position={[0, 1.05, 0.02]}>
+      <Box args={[0.25, 0.25, 0.005]} position={[0, 1.05, 0.02]} onClick={handleClick}>
         <meshStandardMaterial color="#fbbf24" />
       </Box>
-      <Box args={[0.15, 0.08, 0.006]} position={[0, 1.05, 0.025]}>
+      <Box args={[0.15, 0.08, 0.006]} position={[0, 1.05, 0.025]} onClick={handleClick}>
         <meshStandardMaterial color="#1f2937" />
       </Box>
 
       {/* Conduit coming from panel */}
-      <Cylinder args={[0.03, 0.03, 0.6, 8]} position={[0.25, 1.2, 0]} rotation={[0, 0, 0.2]}>
+      <Cylinder args={[0.03, 0.03, 0.6, 8]} position={[0.25, 1.2, 0]} rotation={[0, 0, 0.2]} onClick={handleClick}>
         <meshStandardMaterial color="#6b7280" metalness={0.5} />
       </Cylinder>
 

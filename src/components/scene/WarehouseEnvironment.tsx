@@ -439,55 +439,151 @@ export const WarehouseEnvironment = ({ sceneType }: WarehouseEnvironmentProps) =
           <Pallet position={[3, 0, -10]} />
           <Pallet position={[-5, 0, -7]} />
           <Pallet position={[6, 0, -7]} hasWrap />
+          <Pallet position={[-6, 0, -10]} />
+          <Pallet position={[5, 0, -10]} hasWrap />
 
-          {/* Inbound staging */}
+          {/* Inbound staging - more pallets */}
           <Pallet position={[-10, 0, 5]} />
           <Pallet position={[-8, 0, 5]} hasWrap />
+          <Pallet position={[-6, 0, 5]} />
           <Pallet position={[8, 0, 6]} />
+          <Pallet position={[10, 0, 6]} hasWrap />
+          <Pallet position={[8, 0, 8]} />
+          <Pallet position={[10, 0, 8]} />
+
+          {/* Center area pallets and goods */}
+          <Pallet position={[-2, 0, 0]} hasWrap />
+          <Pallet position={[2, 0, 0]} />
+          <Pallet position={[0, 0, 3]} hasWrap />
 
           {/* Forklifts */}
           <Forklift position={[-4, 0, 2]} rotation={Math.PI / 2} />
           <Forklift position={[6, 0, 3]} rotation={-Math.PI / 4} />
+          <Forklift position={[-10, 0, -4]} rotation={0} />
 
-          {/* More shelving to make the bay feel real */}
-          <ShelvingUnit position={[-13, 0, 10]} />
-          <ShelvingUnit position={[13, 0, 10]} rotation={Math.PI} />
-          <ShelvingUnit position={[-13, 0, 4]} />
-          <ShelvingUnit position={[13, 0, 4]} rotation={Math.PI} />
-          <ShelvingUnit position={[-13, 0, -2]} />
-          <ShelvingUnit position={[13, 0, -2]} rotation={Math.PI} />
+          {/* Shelving units all around */}
+          <ShelvingUnit position={[-13, 0, 12]} />
+          <ShelvingUnit position={[-13, 0, 6]} />
+          <ShelvingUnit position={[-13, 0, 0]} />
+          <ShelvingUnit position={[13, 0, 12]} rotation={Math.PI} />
+          <ShelvingUnit position={[13, 0, 6]} rotation={Math.PI} />
+          <ShelvingUnit position={[13, 0, 0]} rotation={Math.PI} />
+          
+          {/* Back wall shelving */}
+          <ShelvingUnit position={[-6, 0, 13]} rotation={Math.PI / 2} />
+          <ShelvingUnit position={[0, 0, 13]} rotation={Math.PI / 2} />
+          <ShelvingUnit position={[6, 0, 13]} rotation={Math.PI / 2} />
+
+          {/* Loose crates and boxes */}
+          <RoundedBox args={[0.8, 0.6, 0.8]} position={[-1, 0.3, 8]} radius={0.02}>
+            <meshStandardMaterial color="#92400e" roughness={0.8} />
+          </RoundedBox>
+          <RoundedBox args={[0.6, 0.5, 0.6]} position={[1, 0.25, 8.5]} radius={0.02}>
+            <meshStandardMaterial color="#b45309" roughness={0.8} />
+          </RoundedBox>
+          <RoundedBox args={[0.5, 0.4, 0.5]} position={[0, 0.2, 9]} radius={0.02}>
+            <meshStandardMaterial color="#a16207" roughness={0.8} />
+          </RoundedBox>
+
+          {/* Hand pallet truck */}
+          <group position={[3, 0, 8]} rotation={[0, 0.3, 0]}>
+            <Box args={[0.6, 0.08, 1.2]} position={[0, 0.04, 0]}>
+              <meshStandardMaterial color="#f97316" metalness={0.3} roughness={0.6} />
+            </Box>
+            <Box args={[0.08, 0.08, 0.8]} position={[-0.2, 0.04, -0.2]}>
+              <meshStandardMaterial color="#374151" metalness={0.4} />
+            </Box>
+            <Box args={[0.08, 0.08, 0.8]} position={[0.2, 0.04, -0.2]}>
+              <meshStandardMaterial color="#374151" metalness={0.4} />
+            </Box>
+            <Box args={[0.04, 0.9, 0.04]} position={[0, 0.5, -0.6]}>
+              <meshStandardMaterial color="#374151" metalness={0.4} />
+            </Box>
+            <Box args={[0.3, 0.04, 0.04]} position={[0, 0.95, -0.6]}>
+              <meshStandardMaterial color="#1f2937" />
+            </Box>
+          </group>
+
+          {/* Safety equipment stations */}
+          <SafetyStation position={[-15.5, 0, 8]} />
+          <SafetyStation position={[15.5, 0, 8]} />
+          <SafetyStation position={[-15.5, 0, -6]} />
         </>
       )}
       
       {sceneType === 'chemical' && (
         <>
-          {/* Chemical storage racks */}
-          <ShelvingUnit position={[-11, 0, -8]} />
-          <ShelvingUnit position={[11, 0, -8]} rotation={Math.PI} />
+          {/* Chemical storage racks - more of them */}
+          <ShelvingUnit position={[-11, 0, -10]} />
+          <ShelvingUnit position={[-11, 0, -4]} />
+          <ShelvingUnit position={[-11, 0, 2]} />
+          <ShelvingUnit position={[11, 0, -10]} rotation={Math.PI} />
+          <ShelvingUnit position={[11, 0, -4]} rotation={Math.PI} />
+          <ShelvingUnit position={[11, 0, 2]} rotation={Math.PI} />
           
-          {/* Barrel storage areas */}
+          {/* Back wall shelving */}
+          <ShelvingUnit position={[-5, 0, -13]} rotation={Math.PI / 2} />
+          <ShelvingUnit position={[5, 0, -13]} rotation={Math.PI / 2} />
+          
+          {/* Barrel storage areas - more barrels */}
           <group position={[-6, 0, -4]}>
-            {[0, 1, 2].map((x) => [0, 1].map((z) => (
+            {[0, 1, 2, 3].map((x) => [0, 1, 2].map((z) => (
               <ChemicalBarrel key={`red-${x}-${z}`} position={[x * 0.8, 0, z * 0.8]} color="#dc2626" />
             )))}
           </group>
           
           <group position={[4, 0, -4]}>
-            {[0, 1, 2].map((x) => [0, 1].map((z) => (
+            {[0, 1, 2, 3].map((x) => [0, 1, 2].map((z) => (
               <ChemicalBarrel key={`green-${x}-${z}`} position={[x * 0.8, 0, z * 0.8]} color="#22c55e" />
             )))}
           </group>
           
-          <group position={[0, 0, 6]}>
-            {[0, 1].map((x) => [0, 1].map((z) => (
+          <group position={[-2, 0, 6]}>
+            {[0, 1, 2].map((x) => [0, 1].map((z) => (
               <ChemicalBarrel key={`blue-${x}-${z}`} position={[x * 0.8, 0, z * 0.8]} color="#3b82f6" />
             )))}
+          </group>
+
+          <group position={[5, 0, 6]}>
+            {[0, 1].map((x) => [0, 1].map((z) => (
+              <ChemicalBarrel key={`yellow-${x}-${z}`} position={[x * 0.8, 0, z * 0.8]} color="#eab308" />
+            )))}
+          </group>
+
+          {/* IBC Totes (large containers) */}
+          <group position={[-8, 0, 8]}>
+            <Box args={[1.2, 1.0, 1.0]} position={[0, 0.5, 0]}>
+              <meshStandardMaterial color="#f1f5f9" transparent opacity={0.8} />
+            </Box>
+            <Box args={[1.25, 0.1, 1.05]} position={[0, 0, 0]}>
+              <meshStandardMaterial color="#374151" metalness={0.3} />
+            </Box>
+          </group>
+          <group position={[-6.5, 0, 8]}>
+            <Box args={[1.2, 1.0, 1.0]} position={[0, 0.5, 0]}>
+              <meshStandardMaterial color="#f1f5f9" transparent opacity={0.8} />
+            </Box>
+            <Box args={[1.25, 0.1, 1.05]} position={[0, 0, 0]}>
+              <meshStandardMaterial color="#374151" metalness={0.3} />
+            </Box>
+          </group>
+
+          {/* Spill containment pallets */}
+          <group position={[8, 0, 8]}>
+            <Box args={[2.5, 0.15, 1.5]} position={[0, 0.075, 0]}>
+              <meshStandardMaterial color="#fbbf24" roughness={0.7} />
+            </Box>
+            <ChemicalBarrel position={[-0.6, 0.15, 0]} color="#dc2626" />
+            <ChemicalBarrel position={[0.2, 0.15, 0]} color="#dc2626" />
+            <ChemicalBarrel position={[1, 0.15, 0]} color="#f97316" />
           </group>
           
           {/* Safety equipment */}
           <SafetyStation position={[-15.5, 0, 0]} />
           <SafetyStation position={[15.5, 0, 0]} />
           <SafetyStation position={[0, 0, -15.5]} />
+          <SafetyStation position={[-15.5, 0, -8]} />
+          <SafetyStation position={[15.5, 0, -8]} />
           
           {/* Eye wash station */}
           <group position={[-15.5, 0, 8]}>
@@ -499,13 +595,46 @@ export const WarehouseEnvironment = ({ sceneType }: WarehouseEnvironmentProps) =
             </Box>
           </group>
           
+          {/* Second eye wash station */}
+          <group position={[15.5, 0, 8]}>
+            <Box args={[0.5, 1.2, 0.3]} position={[0, 0.9, 0]}>
+              <meshStandardMaterial color="#22c55e" />
+            </Box>
+            <Box args={[0.4, 0.08, 0.25]} position={[0, 1.55, 0.05]}>
+              <meshStandardMaterial color="#9ca3af" metalness={0.6} />
+            </Box>
+          </group>
+
+          {/* Pallets with supplies */}
+          <Pallet position={[0, 0, 0]} hasWrap />
+          <Pallet position={[-3, 0, 10]} />
+          <Pallet position={[3, 0, 10]} hasWrap />
+          <Pallet position={[0, 0, 12]} />
+
+          {/* Forklift */}
+          <Forklift position={[-3, 0, 3]} rotation={0.5} />
+
+          {/* Loose crates */}
+          <RoundedBox args={[0.7, 0.5, 0.7]} position={[6, 0.25, 0]} radius={0.02}>
+            <meshStandardMaterial color="#3b82f6" roughness={0.7} />
+          </RoundedBox>
+          <RoundedBox args={[0.6, 0.45, 0.6]} position={[6.8, 0.225, 0.3]} radius={0.02}>
+            <meshStandardMaterial color="#2563eb" roughness={0.7} />
+          </RoundedBox>
+          
           {/* Hazmat containment zones - floor markings */}
-          {[[-6, -4], [4, -4], [0, 6]].map(([x, z], i) => (
+          {[[-6, -4], [4, -4], [-2, 6], [5, 6], [8, 8]].map(([x, z], i) => (
             <mesh key={`zone-${i}`} rotation={[-Math.PI / 2, 0, 0]} position={[x + 0.8, 0.01, z + 0.4]}>
               <planeGeometry args={[3.5, 2.5]} />
               <meshStandardMaterial color="#fbbf24" transparent opacity={0.25} />
             </mesh>
           ))}
+
+          {/* Warning signs on floor */}
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.006, 3]}>
+            <circleGeometry args={[1.2, 32]} />
+            <meshStandardMaterial color="#fbbf24" transparent opacity={0.4} />
+          </mesh>
         </>
       )}
     </group>

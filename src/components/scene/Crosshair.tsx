@@ -8,7 +8,7 @@ interface CrosshairProps {
 export const Crosshair = ({ isHovering = false, className }: CrosshairProps) => {
   return (
     <div className={cn(
-      "fixed inset-0 flex items-center justify-center pointer-events-none z-50",
+      "fixed inset-0 flex items-center justify-center pointer-events-none z-[999] mix-blend-difference",
       className
     )}>
       <div className={cn(

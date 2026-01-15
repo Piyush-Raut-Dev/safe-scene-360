@@ -15,10 +15,25 @@ interface RealisticHazardProps {
 const SpillHazard = ({ hazard, identified, onIdentify, showHint }: RealisticHazardProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const size = hazard.size || 1.5;
-  
+
   const isChemical = hazard.type === 'chemical';
   const color = isChemical ? '#22c55e' : hazard.description.toLowerCase().includes('water') ? '#60a5fa' : '#1e293b';
-  
+
+  // Irregular spill shape (looks less "toy" than a perfect circle)
+  const spillGeometry = useMemo(() => {
+    const pts: THREE.Vector2[] = [];
+    const segments = 64;
+    for (let i = 0; i < segments; i++) {
+      const a = (i / segments) * Math.PI * 2;
+      const noise = 0.78 + Math.sin(a * 3.2) * 0.08 + Math.sin(a * 7.7) * 0.05 + (Math.random() - 0.5) * 0.06;
+      pts.push(new THREE.Vector2(Math.cos(a) * size * noise, Math.sin(a) * size * noise));
+    }
+    const shape = new THREE.Shape(pts);
+    const geo = new THREE.ShapeGeometry(shape, 16);
+    geo.computeVertexNormals();
+    return geo;
+  }, [size]);
+
   useFrame((state) => {
     if (meshRef.current && !identified && meshRef.current.material) {
       const material = meshRef.current.material as THREE.MeshStandardMaterial;
@@ -31,11 +46,14 @@ const SpillHazard = ({ hazard, identified, onIdentify, showHint }: RealisticHaza
       {/* Main puddle with irregular shape */}
       <mesh
         ref={meshRef}
+        geometry={spillGeometry}
         rotation={[-Math.PI / 2, 0, 0]}
-        onClick={(e) => { e.stopPropagation(); if (!identified) onIdentify(hazard.id); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!identified) onIdentify(hazard.id);
+        }}
       >
-        <circleGeometry args={[size, 48]} />
-        <meshStandardMaterial 
+        <meshStandardMaterial
           color={identified ? '#22c55e' : color}
           transparent
           opacity={0.75}
@@ -669,8 +687,15 @@ const ChemicalHazard = ({ hazard, identified, onIdentify, showHint }: RealisticH
     if (vaporRef.current && !identified) {
       vaporRef.current.children.forEach((child, i) => {
         child.position.y = 0.2 + Math.sin(state.clock.elapsedTime * 2 + i) * 0.1;
-        (child as THREE.Mesh).material && ((child as THREE.Mesh).material as THREE.MeshStandardMaterial).opacity = 
-          0.3 + Math.sin(state.clock.elapsedTime * 3 + i * 0.5) * 0.15;
+
+        const mesh = child as THREE.Mesh;
+        const material = Array.isArray(mesh.material)
+          ? (mesh.material[0] as THREE.MeshStandardMaterial | undefined)
+          : (mesh.material as THREE.MeshStandardMaterial | undefined);
+
+        if (material) {
+          material.opacity = 0.3 + Math.sin(state.clock.elapsedTime * 3 + i * 0.5) * 0.15;
+        }
       });
     }
   });

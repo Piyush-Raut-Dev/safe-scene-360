@@ -184,7 +184,7 @@ const SpillHazard = ({ hazard, identified, onIdentify, showHint }: RealisticHaza
   );
 };
 
-// Realistic unstable stacking with cardboard boxes (supports upper-rack placement)
+// Realistic unstable stacking with cardboard boxes on a shelf
 const StackingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticHazardProps) => {
   const groupRef = useRef<THREE.Group>(null);
 
@@ -198,13 +198,14 @@ const StackingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticH
   const desc = hazard.description?.toLowerCase?.() || '';
   const isChemicalContainers = desc.includes('chemical containers');
 
-  // If this scenario is "chemical containers", it should feel like an upper-rack hazard.
-  const y = isChemicalContainers ? 3.95 : Math.max(hazard.y ?? 0, 0);
-  const scale = isChemicalContainers ? 1.8 : 1.2;
+  // Place on shelf - elevated position
+  const shelfHeight = 1.8;
+  const scale = isChemicalContainers ? 1.6 : 1.1;
 
   const boxColor = identified ? '#22c55e' : '#92400e';
   const boxColorLight = identified ? '#22c55e' : '#b45309';
   const boxColorDark = identified ? '#22c55e' : '#78350f';
+  const shelfColor = '#4b5563';
 
   const handleClick = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
@@ -212,63 +213,90 @@ const StackingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticH
   };
 
   return (
-    <group ref={groupRef} position={[hazard.x, y, hazard.z]} scale={[scale, scale, scale]}>
-      {/* Large invisible click target for easy selection from any angle */}
-      <Box args={[3, 2.5, 3]} position={[0.3, 0.9, 0.1]} visible={false} onClick={handleClick} />
-
-      {/* Pallet base */}
-      <Box args={[1.4, 0.12, 1.4]} position={[0, 0.06, 0]} onClick={handleClick}>
-        <meshStandardMaterial color="#854d0e" />
+    <group position={[hazard.x, 0, hazard.z]}>
+      {/* Shelf unit structure */}
+      {/* Left upright */}
+      <Box args={[0.08, 3.2, 0.5]} position={[-1.1, 1.6, 0]} onClick={handleClick}>
+        <meshStandardMaterial color={shelfColor} metalness={0.4} roughness={0.6} />
       </Box>
-      {[[-0.5, 0, 0.5].map((x, i) => (
-        <Box key={i} args={[0.12, 0.1, 1.4]} position={[x, -0.01, 0]} onClick={handleClick}>
-          <meshStandardMaterial color="#78350f" />
-        </Box>
-      ))]}
+      {/* Right upright */}
+      <Box args={[0.08, 3.2, 0.5]} position={[1.1, 1.6, 0]} onClick={handleClick}>
+        <meshStandardMaterial color={shelfColor} metalness={0.4} roughness={0.6} />
+      </Box>
+      {/* Bottom shelf */}
+      <Box args={[2.3, 0.06, 0.7]} position={[0, 0.5, 0]} onClick={handleClick}>
+        <meshStandardMaterial color={shelfColor} metalness={0.3} roughness={0.7} />
+      </Box>
+      {/* Middle shelf - where unstable stack sits */}
+      <Box args={[2.3, 0.06, 0.7]} position={[0, shelfHeight, 0]} onClick={handleClick}>
+        <meshStandardMaterial color={shelfColor} metalness={0.3} roughness={0.7} />
+      </Box>
+      {/* Top shelf */}
+      <Box args={[2.3, 0.06, 0.7]} position={[0, 3.0, 0]} onClick={handleClick}>
+        <meshStandardMaterial color={shelfColor} metalness={0.3} roughness={0.7} />
+      </Box>
+      {/* Cross braces */}
+      <Box args={[2.1, 0.04, 0.04]} position={[0, 0.15, -0.2]} onClick={handleClick}>
+        <meshStandardMaterial color={shelfColor} metalness={0.4} />
+      </Box>
+      <Box args={[2.1, 0.04, 0.04]} position={[0, 2.5, -0.2]} onClick={handleClick}>
+        <meshStandardMaterial color={shelfColor} metalness={0.4} />
+      </Box>
 
-      {/* First layer - stable */}
-      <RoundedBox args={[0.6, 0.45, 0.6]} position={[-0.3, 0.35, -0.3]} radius={0.02} onClick={handleClick}>
-        <meshStandardMaterial color={boxColorLight} />
-      </RoundedBox>
-      <RoundedBox args={[0.55, 0.4, 0.6]} position={[0.3, 0.32, -0.25]} radius={0.02} onClick={handleClick}>
-        <meshStandardMaterial color={boxColor} />
-      </RoundedBox>
-      <RoundedBox args={[0.5, 0.5, 0.55]} position={[0, 0.37, 0.35]} radius={0.02} onClick={handleClick}>
-        <meshStandardMaterial color={boxColorDark} />
-      </RoundedBox>
+      {/* Unstable stack on middle shelf */}
+      <group ref={groupRef} position={[0, shelfHeight + 0.06, 0]} scale={[scale, scale, scale]}>
+        {/* Large invisible click target for easy selection from any angle */}
+        <Box args={[3, 2.5, 2]} position={[0.1, 0.8, 0]} visible={false} onClick={handleClick} />
 
-      {/* Second layer - starting to lean */}
-      <RoundedBox args={[0.55, 0.4, 0.55]} position={[-0.15, 0.8, 0]} rotation={[0.05, 0.1, 0.08]} onClick={handleClick}>
-        <meshStandardMaterial color={boxColorLight} />
-      </RoundedBox>
-      <RoundedBox args={[0.45, 0.35, 0.5]} position={[0.35, 0.75, -0.1]} rotation={[0.03, -0.05, 0.12]} onClick={handleClick}>
-        <meshStandardMaterial color={boxColor} />
-      </RoundedBox>
+        {/* First layer - stable on shelf */}
+        <RoundedBox args={[0.6, 0.45, 0.5]} position={[-0.3, 0.23, 0]} radius={0.02} onClick={handleClick}>
+          <meshStandardMaterial color={boxColorLight} />
+        </RoundedBox>
+        <RoundedBox args={[0.55, 0.4, 0.5]} position={[0.3, 0.2, 0.02]} radius={0.02} onClick={handleClick}>
+          <meshStandardMaterial color={boxColor} />
+        </RoundedBox>
 
-      {/* Third layer - very unstable */}
-      <RoundedBox args={[0.5, 0.38, 0.5]} position={[0.1, 1.2, 0.05]} rotation={[-0.08, 0.15, -0.18]} onClick={handleClick}>
-        <meshStandardMaterial color={boxColorDark} />
-      </RoundedBox>
+        {/* Second layer - starting to lean */}
+        <RoundedBox args={[0.55, 0.4, 0.48]} position={[-0.05, 0.65, 0]} rotation={[0.05, 0.1, 0.1]} onClick={handleClick}>
+          <meshStandardMaterial color={boxColorLight} />
+        </RoundedBox>
+        <RoundedBox args={[0.45, 0.35, 0.45]} position={[0.4, 0.6, 0.05]} rotation={[0.03, -0.05, 0.15]} onClick={handleClick}>
+          <meshStandardMaterial color={boxColor} />
+        </RoundedBox>
 
-      {/* Top box - about to fall */}
-      <RoundedBox args={[0.4, 0.3, 0.4]} position={[0.2, 1.55, 0.1]} rotation={[0.1, 0.2, -0.25]} onClick={handleClick}>
-        <meshStandardMaterial color={boxColorLight} />
-      </RoundedBox>
+        {/* Third layer - very unstable, leaning out */}
+        <RoundedBox args={[0.5, 0.38, 0.45]} position={[0.15, 1.0, 0.1]} rotation={[-0.1, 0.15, -0.2]} onClick={handleClick}>
+          <meshStandardMaterial color={boxColorDark} />
+        </RoundedBox>
 
-      {/* Fallen box on ground */}
-      <RoundedBox args={[0.45, 0.35, 0.45]} position={[1.3, 0.18, 0.4]} rotation={[0.4, 0.6, 1.3]} radius={0.02} onClick={handleClick}>
+        {/* Top box - about to fall off shelf */}
+        <RoundedBox args={[0.4, 0.3, 0.38]} position={[0.25, 1.35, 0.15]} rotation={[0.12, 0.2, -0.28]} onClick={handleClick}>
+          <meshStandardMaterial color={boxColorLight} />
+        </RoundedBox>
+      </group>
+
+      {/* Fallen box on ground - fell from shelf */}
+      <RoundedBox args={[0.45, 0.35, 0.45]} position={[0.8, 0.18, 0.9]} rotation={[0.4, 0.6, 1.3]} radius={0.02} onClick={handleClick}>
         <meshStandardMaterial color={boxColor} />
       </RoundedBox>
 
       {/* Scattered items from fallen box */}
-      <Sphere args={[0.06, 8, 8]} position={[1.6, 0.06, 0.2]} onClick={handleClick}>
+      <Sphere args={[0.06, 8, 8]} position={[1.1, 0.06, 1.0]} onClick={handleClick}>
         <meshStandardMaterial color="#3b82f6" />
       </Sphere>
-      <Box args={[0.08, 0.08, 0.08]} position={[1.4, 0.04, 0.7]} rotation={[0.3, 0.5, 0.2]} onClick={handleClick}>
+      <Box args={[0.08, 0.08, 0.08]} position={[0.6, 0.04, 1.1]} rotation={[0.3, 0.5, 0.2]} onClick={handleClick}>
         <meshStandardMaterial color="#dc2626" />
       </Box>
 
-      {showHint && !identified && <pointLight position={[0, 1.8, 0]} color="#ef4444" intensity={4} distance={5} />}
+      {/* Some stable boxes on bottom shelf for context */}
+      <RoundedBox args={[0.5, 0.4, 0.5]} position={[-0.6, 0.73, 0]} radius={0.02} onClick={handleClick}>
+        <meshStandardMaterial color="#64748b" />
+      </RoundedBox>
+      <RoundedBox args={[0.45, 0.35, 0.45]} position={[0.5, 0.7, 0]} radius={0.02} onClick={handleClick}>
+        <meshStandardMaterial color="#64748b" />
+      </RoundedBox>
+
+      {showHint && !identified && <pointLight position={[0, shelfHeight + 1.5, 0.5]} color="#ef4444" intensity={4} distance={5} />}
     </group>
   );
 };
@@ -307,17 +335,72 @@ const BlockedExitHazard = ({ hazard, identified, onIdentify, showHint }: Realist
       </Box>
 
       {/* EMERGENCY EXIT text sign above door */}
-      <Box args={[1.0, 0.25, 0.03]} position={[0, 2.85, 0.1]}>
-        <meshStandardMaterial color="#dc2626" emissive="#dc2626" emissiveIntensity={0.8} />
-      </Box>
-      {/* "EMERGENCY EXIT" text simulation */}
-      <Box args={[0.85, 0.12, 0.032]} position={[0, 2.88, 0.12]}>
-        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.6} />
-      </Box>
-      <Box args={[0.7, 0.06, 0.033]} position={[0, 2.8, 0.13]}>
-        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.4} />
-      </Box>
-      <pointLight position={[0, 2.85, 0.3]} color="#dc2626" intensity={3} distance={3} />
+      <group position={[0, 3.0, 0.15]}>
+        {/* Sign background - green for emergency exit */}
+        <Box args={[1.3, 0.35, 0.04]}>
+          <meshStandardMaterial color="#16a34a" emissive="#16a34a" emissiveIntensity={0.6} />
+        </Box>
+        {/* White border */}
+        <Box args={[1.2, 0.28, 0.045]} position={[0, 0, 0.005]}>
+          <meshStandardMaterial color="#16a34a" />
+        </Box>
+        {/* Text: EMERGENCY EXIT - simulated with white boxes */}
+        {/* E */}
+        <Box args={[0.06, 0.15, 0.05]} position={[-0.52, 0, 0.01]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} />
+        </Box>
+        {/* M */}
+        <Box args={[0.07, 0.15, 0.05]} position={[-0.42, 0, 0.01]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} />
+        </Box>
+        {/* E */}
+        <Box args={[0.06, 0.15, 0.05]} position={[-0.32, 0, 0.01]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} />
+        </Box>
+        {/* R */}
+        <Box args={[0.06, 0.15, 0.05]} position={[-0.23, 0, 0.01]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} />
+        </Box>
+        {/* G */}
+        <Box args={[0.06, 0.15, 0.05]} position={[-0.14, 0, 0.01]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} />
+        </Box>
+        {/* E */}
+        <Box args={[0.06, 0.15, 0.05]} position={[-0.05, 0, 0.01]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} />
+        </Box>
+        {/* N */}
+        <Box args={[0.06, 0.15, 0.05]} position={[0.04, 0, 0.01]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} />
+        </Box>
+        {/* C */}
+        <Box args={[0.06, 0.15, 0.05]} position={[0.13, 0, 0.01]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} />
+        </Box>
+        {/* Y */}
+        <Box args={[0.06, 0.15, 0.05]} position={[0.22, 0, 0.01]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} />
+        </Box>
+        {/* Space + EXIT */}
+        <Box args={[0.06, 0.15, 0.05]} position={[0.35, 0, 0.01]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} />
+        </Box>
+        <Box args={[0.06, 0.15, 0.05]} position={[0.44, 0, 0.01]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} />
+        </Box>
+        <Box args={[0.06, 0.15, 0.05]} position={[0.53, 0, 0.01]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.8} />
+        </Box>
+        {/* Running man icon */}
+        <Box args={[0.08, 0.12, 0.05]} position={[-0.55, -0.02, 0.01]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.6} />
+        </Box>
+        {/* Arrow pointing right */}
+        <Box args={[0.12, 0.04, 0.05]} position={[0.52, -0.02, 0.01]}>
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.6} />
+        </Box>
+      </group>
+      <pointLight position={[0, 3.0, 0.4]} color="#22c55e" intensity={4} distance={4} />
 
       {/* Running man icon on door */}
       <Box args={[0.18, 0.18, 0.01]} position={[0, 2.0, 0.06]}>
@@ -615,7 +698,7 @@ const EquipmentHazard = ({ hazard, identified, onIdentify, showHint }: Realistic
   );
 };
 
-// Flickering/broken industrial light - large fixture with high intensity
+// Flickering/broken industrial light - large fixture with HIGH INTENSITY RED color
 const LightingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticHazardProps) => {
   const lightRef = useRef<THREE.PointLight>(null);
   const bulbRef1 = useRef<THREE.Mesh>(null);
@@ -623,13 +706,13 @@ const LightingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticH
 
   useFrame(() => {
     if (!identified) {
-      const flicker = Math.random() > 0.6 ? 0 : 2 + Math.random() * 1.5;
-      if (lightRef.current) lightRef.current.intensity = flicker * 2;
+      const flicker = Math.random() > 0.5 ? 0 : 3 + Math.random() * 2;
+      if (lightRef.current) lightRef.current.intensity = flicker * 4;
       if (bulbRef1.current && bulbRef1.current.material) {
-        (bulbRef1.current.material as THREE.MeshStandardMaterial).emissiveIntensity = flicker * 1.2;
+        (bulbRef1.current.material as THREE.MeshStandardMaterial).emissiveIntensity = flicker * 2;
       }
       if (bulbRef2.current && bulbRef2.current.material) {
-        (bulbRef2.current.material as THREE.MeshStandardMaterial).emissiveIntensity = flicker * 0.8;
+        (bulbRef2.current.material as THREE.MeshStandardMaterial).emissiveIntensity = flicker * 1.5;
       }
     }
   });
@@ -668,7 +751,7 @@ const LightingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticH
         <meshStandardMaterial color="#d1d5db" metalness={0.8} roughness={0.2} />
       </Box>
 
-      {/* Fluorescent tube 1 */}
+      {/* Fluorescent tube 1 - RED */}
       <Cylinder
         ref={bulbRef1}
         args={[0.045, 0.045, 2.2, 16]}
@@ -677,15 +760,15 @@ const LightingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticH
         onClick={handleClick}
       >
         <meshStandardMaterial
-          color={identified ? '#22c55e' : '#fef9c3'}
-          emissive={identified ? '#22c55e' : '#fef9c3'}
-          emissiveIntensity={1.5}
+          color={identified ? '#22c55e' : '#ff3333'}
+          emissive={identified ? '#22c55e' : '#ff0000'}
+          emissiveIntensity={3}
           transparent
           opacity={0.95}
         />
       </Cylinder>
 
-      {/* Fluorescent tube 2 */}
+      {/* Fluorescent tube 2 - RED */}
       <Cylinder
         ref={bulbRef2}
         args={[0.045, 0.045, 2.2, 16]}
@@ -694,9 +777,9 @@ const LightingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticH
         onClick={handleClick}
       >
         <meshStandardMaterial
-          color={identified ? '#22c55e' : '#fef9c3'}
-          emissive={identified ? '#22c55e' : '#fef9c3'}
-          emissiveIntensity={1.5}
+          color={identified ? '#22c55e' : '#ff3333'}
+          emissive={identified ? '#22c55e' : '#ff0000'}
+          emissiveIntensity={3}
           transparent
           opacity={0.95}
         />
@@ -717,13 +800,13 @@ const LightingHazard = ({ hazard, identified, onIdentify, showHint }: RealisticH
         <meshStandardMaterial color={identified ? '#22c55e' : '#dc2626'} />
       </Cylinder>
 
-      {/* Sparking point */}
-      <Sphere args={[0.06, 8, 8]} position={[0.7, -0.3, 0.12]} onClick={handleClick}>
-        <meshStandardMaterial color="#fbbf24" emissive="#fbbf24" emissiveIntensity={identified ? 0 : 2} transparent opacity={0.9} />
+      {/* Sparking point - more intense */}
+      <Sphere args={[0.08, 8, 8]} position={[0.7, -0.3, 0.12]} onClick={handleClick}>
+        <meshStandardMaterial color="#ff6600" emissive="#ff4400" emissiveIntensity={identified ? 0 : 4} transparent opacity={0.9} />
       </Sphere>
 
       {!identified && (
-        <pointLight ref={lightRef} position={[0, -0.5, 0]} color="#fef3c7" intensity={3} distance={15} />
+        <pointLight ref={lightRef} position={[0, -0.5, 0]} color="#ff0000" intensity={8} distance={20} />
       )}
 
       {showHint && !identified && <pointLight position={[0, -0.7, 0]} color="#ef4444" intensity={4} distance={5} />}

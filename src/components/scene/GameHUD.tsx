@@ -8,9 +8,6 @@ import {
   Eye, 
   Trophy, 
   Lightbulb,
-  Volume2,
-  VolumeX,
-  Maximize,
   RotateCcw,
   HelpCircle
 } from 'lucide-react';
@@ -44,7 +41,6 @@ export const GameHUD = ({
   isComplete,
   score
 }: GameHUDProps) => {
-  const [soundEnabled, setSoundEnabled] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
   
   const progress = (identifiedHazards.length / hazards.length) * 100;
@@ -170,18 +166,6 @@ export const GameHUD = ({
             onClick={onToggleHints}
           >
             <Lightbulb className={cn("h-5 w-5", showHints ? "text-accent" : "text-muted-foreground")} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="bg-card/60 backdrop-blur-md hover:bg-card/80"
-            onClick={() => setSoundEnabled(!soundEnabled)}
-          >
-            {soundEnabled ? (
-              <Volume2 className="h-5 w-5 text-muted-foreground" />
-            ) : (
-              <VolumeX className="h-5 w-5 text-muted-foreground" />
-            )}
           </Button>
           <Button
             variant="ghost"

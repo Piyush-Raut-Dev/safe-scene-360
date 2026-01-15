@@ -9,7 +9,7 @@ export const Crosshair = ({ isHovering = false, className }: CrosshairProps) => 
   return (
     <div
       className={cn(
-        "fixed inset-0 flex items-center justify-center pointer-events-none z-[999]",
+        "fixed inset-0 flex items-center justify-center pointer-events-none select-none z-[1000] mix-blend-difference",
         className
       )}
     >
